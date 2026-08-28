@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HI | Assets Host BBVA</title>
+  
+  <!-- Vue 3 CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'bbva-midnight': '#070E46',
+            'bbva-electric': '#001391',
+            'bbva-sand': '#F7F8F8',
+            'bbva-gray': '#D3D3D3'
+          },
+          fontFamily: {
+            sans: ['"Segoe UI"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body class="bg-bbva-sand text-bbva-midnight min-h-screen">
+
+  <!-- ====================================== -->
+  <!-- CONTENEDOR PRINCIPAL VUE               -->
+  <!-- ====================================== -->
+  <div id="app" class="max-w-6xl mx-auto p-6 md:p-10">
+    
+    <!-- ====================================== -->
+    <!-- CABECERA CORPORATIVA                   -->
+    <!-- ====================================== -->
+    <header class="mb-10 flex flex-col items-center justify-center text-center">
+      <div class="w-16 h-16 bg-bbva-midnight rounded-2xl flex items-center justify-center mb-4 shadow-lg">
+        <h1 class="text-3xl font-black text-white tracking-tighter">HI.</h1>
+      </div>
+      <h2 class="text-2xl font-black text-bbva-midnight">Librería de Recursos Estáticos</h2>
+      <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2">Site Compensación • CDN Global</p>
+    </header>
+
+    <!-- ====================================== -->
+    <!-- GRILLA DE IMÁGENES (ASSETS GRID)       -->
+    <!-- ====================================== -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      
+      <!-- Iteración Dinámica del Diccionario -->
+      <div 
+        v-for="(recurso, index) in recursos" 
+        :key="index"
+        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:border-bbva-electric transition-all group flex flex-col"
+      >
+        <!-- Canvas de la Imagen (Clic Derecho Habilitado) -->
+        <div class="h-32 bg-gray-50/50 flex items-center justify-center p-4 relative border-b border-gray-100">
+          <img 
+            :src="recurso.archivo" 
+            :alt="recurso.nombre" 
+            class="max-w-full max-h-full object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-110"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            title="Clic derecho > Copiar dirección de la imagen"
+          >
+          <!-- Estado Fallido: Si no encuentra la imagen -->
+          <div class="hidden flex-col items-center justify-center text-gray-400 absolute inset-0">
+            <span class="material-symbols-outlined text-[24px] mb-1 opacity-50">broken_image</span>
+            <span class="text-[9px] font-bold uppercase tracking-wider">No Encontrada</span>
+          </div>
+        </div>
+
+        <!-- Metadata del Recurso -->
+        <div class="p-4 flex flex-col flex-1 bg-white">
+          <div class="flex justify-between items-start mb-1">
+            <h3 class="text-[12px] font-black text-bbva-midnight leading-tight pr-2">{{ recurso.nombre }}</h3>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-bbva-electric rounded-md border border-blue-100 shrink-0">{{ recurso.tipo }}</span>
+          </div>
+          <p class="text-[10px] text-gray-400 font-mono mt-auto pt-2 truncate" :title="recurso.archivo">{{ recurso.archivo }}</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ====================================== -->
+  <!-- LÓGICA VUE 3 (EL DICCIONARIO)          -->
+  <!-- ====================================== -->
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          // 🚨 AQUÍ GESTIONAS TUS IMÁGENES
+          // Agrega más objetos a este arreglo a medida que subas más archivos a tu carpeta en GitHub
+          recursos: [
+            { nombre: 'Favicon Site Compensación', archivo: 'fav_site.png', tipo: 'PNG' },
+            { nombre: 'Favicon Herramienta Comunicaciones', archivo: 'fav_comunicaciones.png', tipo: 'PNG' },
+            //{ nombre: 'Logo Background', archivo: 'bg-logo.jpg', tipo: 'JPG' },
+            //{ nombre: 'Avatar Default', archivo: 'avatar.svg', tipo: 'SVG' }
+          ]
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
