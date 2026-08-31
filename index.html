@@ -48,42 +48,61 @@
     </header>
 
     <!-- ====================================== -->
-    <!-- GRILLA DE IMÁGENES (ASSETS GRID)       -->
+    <!-- ITERADOR MAESTRO DE CATEGORÍAS         -->
     <!-- ====================================== -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div v-for="(categoria, catIndex) in categorias" :key="catIndex" class="mb-14">
       
-      <!-- Iteración Dinámica del Diccionario -->
-      <div 
-        v-for="(recurso, index) in recursos" 
-        :key="index"
-        class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:border-bbva-electric transition-all group flex flex-col"
-      >
-        <!-- Canvas de la Imagen (Clic Derecho Habilitado) -->
-        <div class="h-32 bg-gray-50/50 flex items-center justify-center p-4 relative border-b border-gray-100">
-          <img 
-            :src="recurso.archivo" 
-            :alt="recurso.nombre" 
-            class="max-w-full max-h-full object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-110"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-            title="Clic derecho > Copiar dirección de la imagen"
-          >
-          <!-- Estado Fallido: Si no encuentra la imagen -->
-          <div class="hidden flex-col items-center justify-center text-gray-400 absolute inset-0">
-            <span class="material-symbols-outlined text-[24px] mb-1 opacity-50">broken_image</span>
-            <span class="text-[9px] font-bold uppercase tracking-wider">No Encontrada</span>
-          </div>
-        </div>
-
-        <!-- Metadata del Recurso -->
-        <div class="p-4 flex flex-col flex-1 bg-white">
-          <div class="flex justify-between items-start mb-1">
-            <h3 class="text-[12px] font-black text-bbva-midnight leading-tight pr-2">{{ recurso.nombre }}</h3>
-            <span class="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-bbva-electric rounded-md border border-blue-100 shrink-0">{{ recurso.tipo }}</span>
-          </div>
-          <p class="text-[10px] text-gray-400 font-mono mt-auto pt-2 truncate" :title="recurso.archivo">{{ recurso.archivo }}</p>
-        </div>
+      <!-- Título y Metadata de la Sección -->
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 pb-3">
+        <span class="material-symbols-outlined text-bbva-electric text-[28px]">{{ categoria.iconoSeccion }}</span>
+        <h3 class="text-xl font-black text-bbva-midnight">{{ categoria.nombre }}</h3>
+        <span class="ml-auto text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-md">
+          {{ categoria.recursos.length }} items
+        </span>
       </div>
 
+      <!-- ====================================== -->
+      <!-- GRILLA DE IMÁGENES (ASSETS GRID)       -->
+      <!-- ====================================== -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+        
+        <!-- Iteración Dinámica de los Recursos Internos -->
+        <div 
+          v-for="(recurso, index) in categoria.recursos" 
+          :key="index"
+          class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md hover:border-bbva-electric transition-all group flex flex-col"
+        >
+          <!-- Canvas Dinámico (Recibe clases del diccionario padre) -->
+          <div 
+            class="flex items-center justify-center p-4 relative border-b border-gray-100"
+            :class="categoria.cajaClass"
+          >
+            <img 
+              :src="recurso.archivo" 
+              :alt="recurso.nombre" 
+              class="object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-110"
+              :class="categoria.imgClass"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              title="Clic derecho > Copiar dirección de la imagen"
+            >
+            <!-- Estado Fallido -->
+            <div class="hidden flex-col items-center justify-center text-gray-400 absolute inset-0">
+              <span class="material-symbols-outlined text-[24px] mb-1 opacity-50">broken_image</span>
+              <span class="text-[9px] font-bold uppercase tracking-wider">No Encontrada</span>
+            </div>
+          </div>
+
+          <!-- Metadata del Recurso -->
+          <div class="p-4 flex flex-col flex-1 bg-white">
+            <div class="flex justify-between items-start mb-1">
+              <h3 class="text-[12px] font-black text-bbva-midnight leading-tight pr-2">{{ recurso.nombre }}</h3>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 bg-blue-50 text-bbva-electric rounded-md border border-blue-100 shrink-0">{{ recurso.tipo }}</span>
+            </div>
+            <p class="text-[10px] text-gray-400 font-mono mt-auto pt-2 truncate" :title="recurso.archivo">{{ recurso.archivo }}</p>
+          </div>
+        </div>
+
+      </div>
     </div>
 
   </div>
@@ -97,18 +116,55 @@
     createApp({
       data() {
         return {
-          // 🚨 AQUÍ GESTIONAS TUS IMÁGENES
-          // Agrega más objetos a este arreglo a medida que subas más archivos a tu carpeta en GitHub
-          recursos: [
-            { nombre: 'Favicon Site Compensación _ v1', archivo: 'fav_site_v1.png', tipo: 'PNG' },
-            { nombre: 'Favicon Site Compensación _ v2', archivo: 'fav_site.png', tipo: 'PNG' },
-            { nombre: 'Favicon Herramienta Comunicaciones', archivo: 'fav_comunicaciones.png', tipo: 'PNG' },
-            { nombre: 'Favicon Logo COCO', archivo: 'fav_coco.png', tipo: 'PNG' },
-            { nombre: 'Favicon Mi Retribución Variable v1', archivo: 'fav_mrv_v1.png', tipo: 'PNG' },
-            { nombre: 'Favicon Mi Retribución Variable', archivo: 'fav_mrv.png', tipo: 'PNG' },
-            { nombre: 'Favicon Slide App', archivo: 'fav_slide.png', tipo: 'PNG' },
-            { nombre: 'Favicon Slides App', archivo: 'fav_slides.png', tipo: 'PNG' },
-            //{ nombre: 'Avatar Default', archivo: 'avatar.svg', tipo: 'SVG' } fav_slide_v1
+          // 🚨 DICCIONARIO MAESTRO ANIDADO
+          categorias: [
+            {
+              nombre: 'Favicons',
+              iconoSeccion: 'tab',
+              cajaClass: 'h-32 bg-slate-50', // Caja estándar, gris sutil
+              imgClass: 'max-w-[48px] max-h-[48px]', // Imagen restringida a tamaño micro
+              recursos: [
+                { nombre: 'Favicon Site Compensación _ v1', archivo: 'fav_site_v1.png', tipo: 'PNG' },
+                { nombre: 'Favicon Site Compensación _ v2', archivo: 'fav_site.png', tipo: 'PNG' },
+                { nombre: 'Favicon Herramienta Comunicaciones', archivo: 'fav_comunicaciones.png', tipo: 'PNG' },
+                { nombre: 'Favicon Logo COCO', archivo: 'fav_coco.png', tipo: 'PNG' },
+                { nombre: 'Favicon Mi Retribución Variable v1', archivo: 'fav_mrv_v1.png', tipo: 'PNG' },
+                { nombre: 'Favicon Mi Retribución Variable', archivo: 'fav_mrv.png', tipo: 'PNG' },
+                { nombre: 'Favicon Slide App', archivo: 'fav_slide.png', tipo: 'PNG' },
+                { nombre: 'Favicon Slides App', archivo: 'fav_slides.png', tipo: 'PNG' }
+              ]
+            },
+            {
+              nombre: 'Logotipos Corporativos',
+              iconoSeccion: 'branding_watermark',
+              cajaClass: 'h-40 bg-blue-50/40', // Caja más alta, azul corporativo
+              imgClass: 'max-w-[140px] max-h-[80px]', // Imagen ancha (rectangular)
+              recursos: [
+                // Agrega aquí tus logos futuros
+                { nombre: 'Logo BBVA Blue', archivo: 'bbva_blue.png', tipo: 'PNG' },
+                { nombre: 'Logo BBVA White', archivo: 'bbva_white.png', tipo: 'PNG' },
+              ]
+            },
+            {
+              nombre: 'Iconos UI',
+              iconoSeccion: 'apps',
+              cajaClass: 'h-24 bg-sky-50/50', // Caja pequeña
+              imgClass: 'max-w-[32px] max-h-[32px]', // Imagen muy pequeña
+              recursos: [
+                // Agrega aquí tus iconos futuros
+                // { nombre: 'Icono Success', archivo: 'success.png', tipo: 'PNG' }
+              ]
+            },
+            {
+              nombre: 'Imágenes Grandes',
+              iconoSeccion: 'image',
+              cajaClass: 'h-48 bg-gray-100', // Caja muy alta
+              imgClass: 'max-w-full max-h-full rounded-md', // Imagen ajustada al 100%
+              recursos: [
+                // Agrega aquí imágenes amplias
+                // { nombre: 'Banner Bienvenida', archivo: 'banner.jpg', tipo: 'JPG' }
+              ]
+            }
           ]
         };
       }
