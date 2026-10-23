@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación Corporativa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { corporate: { primary: '#001391', secondary: '#85C8FF', dark: '#070E46' } } } } }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+    <style>
+        .slide-fade-enter-active { transition: all 0.5s ease; }
+        .slide-fade-leave-active { transition: all 0.3s cubic-bezier(1.0, 0.5, 0.8, 1.0); }
+        .slide-fade-enter, .slide-fade-leave-to { transform: translateX(20px); opacity: 0; }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+        .fade-enter, .fade-leave-to { opacity: 0; }
+        .no-select { user-select: none; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: #85C8FF; border-radius: 10px; }
+
+        /* Único ajuste visual: sensor luminoso de la portada */
+        .coco-sensor-stage {
+            position: relative;
+            width: 100%;
+            max-width: 370px;
+            height: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            isolation: isolate;
+        }
+        .coco-sensor-stage::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -2;
+            border-radius: 50%;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(245,248,252,.95) 0%,
+                rgba(228,233,240,.62) 30%,
+                rgba(240,243,247,.27) 58%,
+                rgba(255,255,255,0) 77%
+            );
+            filter: blur(18px);
+        }
+        .coco-sensor-ring {
+            position: absolute;
+            z-index: -1;
+            width: 72%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 1.5px solid rgba(177,188,205,.45);
+            box-shadow:
+                0 0 18px rgba(235,240,247,.65),
+                inset 0 0 15px rgba(242,245,250,.4);
+            opacity: 0;
+            animation: coco-sensor-pulse 6s ease-out infinite;
+            pointer-events: none;
+        }
+        .coco-sensor-ring:nth-child(2) { animation-delay: 2s; }
+        .coco-sensor-ring:nth-child(3) { animation-delay: 4s; }
+        @keyframes coco-sensor-pulse {
+            0% { transform: scale(.65); opacity: 0; }
+            14% { opacity: .55; }
+            65% { opacity: .22; }
+            100% { transform: scale(1.65); opacity: 0; }
+        }
+        .coco-sensor-image {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 310px;
+            height: 390px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow:
+                0 15px 45px rgba(160,170,185,.13),
+                0 0 35px rgba(230,236,244,.45);
+        }
+        .coco-sensor-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 24px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .coco-sensor-ring { animation: none; opacity: .16; }
+        }
+    </style>
+</head>
+<body class="bg-corporate-dark text-white font-sans antialiased h-screen w-screen overflow-hidden">
+    <div id="app" class="w-full h-full flex flex-col items-center justify-center relative p-4 sm:px-[100px] sm:py-[10px]">
+        <div class="bg-white text-corporate-dark w-full h-full rounded-2xl shadow-2xl flex flex-col relative overflow-hidden border border-corporate-secondary/30">
+            <transition name="fade">
+                <div v-if="showThankYou" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center">
+                    <button @click="closeThankYou" class="absolute top-6 right-6 p-2 text-gray-400 hover:text-corporate-primary bg-gray-50 hover:bg-corporate-secondary/20 rounded-full transition-all duration-300 focus:outline-none shadow-sm active:scale-95">
+                        <i class="material-icons text-3xl block">close</i>
+                    </button>
+                    <div class="text-center animate-bounce mt-[-20px]" style="animation-duration: 2s;">
+                        <i class="material-icons text-6xl text-corporate-secondary mb-4 opacity-50">verified</i>
+                    </div>
+                    <h1 class="text-5xl sm:text-7xl font-bold text-corporate-primary tracking-tight shadow-sm">¡Gracias!</h1>
+                </div>
+            </transition>
+
+            <div class="shrink-0 h-2 w-full bg-gradient-to-r from-corporate-primary to-corporate-secondary"></div>
+
+            <div class="flex-grow overflow-y-auto flex flex-col px-6 py-6 sm:px-16 sm:pt-10 sm:pb-12 relative">
+                <div class="absolute top-3 right-4 sm:top-5 sm:right-6 z-20 flex items-center text-corporate-primary font-medium text-lg sm:text-xl tracking-tighter select-none pointer-events-none opacity-90">
+                    BBV<span class="inline-block transform rotate-180 translate-y-[1px] ml-[1px]">V</span>
+                </div>
+
+                <transition name="slide-fade" mode="out-in">
+                    <div v-if="slides[currentSlide].isCover" :key="'cover-' + currentSlide" class="w-full max-w-5xl mx-auto flex flex-col items-start justify-center text-left py-10 relative z-10 h-full">
+                        <div class="w-full grid grid-cols-12 gap-5 items-center">
+                            <div class="col-span-12 sm:col-span-7">
+                                <div class="w-16 h-1.5 rounded-full bg-corporate-secondary mb-7"></div>
+                                <h1 class="text-4xl sm:text-6xl font-black text-corporate-primary mb-5 tracking-tight leading-tight">{{ slides[currentSlide].title }}</h1>
+                                <h2 class="text-2xl sm:text-3xl font-bold text-corporate-primary opacity-80 mb-7 leading-snug">{{ slides[currentSlide].department }}</h2>
+                                <p class="text-sm sm:text-base text-gray-500 font-medium leading-relaxed max-w-md">Estrategia de comunicación, despliegue y adopción</p>
+                            </div>
+                            <div class="col-span-12 sm:col-span-5 flex items-center justify-center" v-html="slides[currentSlide].content"></div>
+                        </div>
+                        <div class="mt-auto pt-5">
+                            <p class="text-corporate-primary font-bold text-lg sm:text-2xl tracking-wide">{{ slides[currentSlide].date || computedDate }}</p>
+                        </div>
+                    </div>
+
+                    <div v-else-if="slides[currentSlide].isIndex" :key="'index-' + currentSlide" class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
+                        <h2 class="text-2xl sm:text-4xl font-bold text-corporate-primary mb-10 border-b border-gray-200 pb-4">{{ slides[currentSlide].title }}</h2>
+                        <div class="flex flex-col gap-6 max-w-3xl pl-2 sm:pl-4">
+                            <div v-for="(item, idx) in slides[currentSlide].items" :key="idx" class="flex items-center gap-5 sm:gap-6 group">
+                                <button @click="navigateFromIndex(idx)" class="w-12 h-12 shrink-0 border-2 border-corporate-primary text-corporate-primary font-bold text-xl sm:text-2xl flex items-center justify-center bg-white shadow-sm hover:bg-corporate-primary hover:text-white transition-colors rounded-[10px] focus:outline-none active:scale-95 cursor-pointer">
+                                    {{ idx + 1 }}
+                                </button>
+                                <span class="font-bold text-corporate-dark text-lg sm:text-xl">{{ item }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-else :key="'content-' + currentSlide" class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
+                        <div class="flex items-center gap-4 mb-6">
+                            <button @click="returnToIndex" :class="{'cursor-pointer hover:bg-corporate-secondary/20 transition-colors active:scale-95': hasIndex, 'cursor-default': !hasIndex}" class="shrink-0 inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 border-2 border-corporate-primary text-corporate-primary font-bold text-xl sm:text-2xl shadow-sm bg-white rounded-[10px] focus:outline-none">
+                                <template v-if="slides[currentSlide].stepNumber">{{ slides[currentSlide].stepNumber }}</template>
+                                <i v-else-if="slides[currentSlide].icon" class="material-icons text-xl sm:text-2xl">{{ slides[currentSlide].icon }}</i>
+                            </button>
+                            <h2 class="text-lg sm:text-2xl font-bold text-corporate-primary m-0 leading-tight pr-24">{{ slides[currentSlide].title }}</h2>
+                        </div>
+                        <div class="w-full text-xs sm:text-sm" v-html="slides[currentSlide].content"></div>
+                    </div>
+                </transition>
+            </div>
+
+            <div class="shrink-0 bg-gray-50 border-t border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 z-10 text-sm">
+                <div class="flex flex-col items-center sm:items-start w-full sm:w-auto">
+                    <button @click="prevSlide" :disabled="isFirstSlide" class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300" :class="isFirstSlide ? 'text-gray-400 cursor-not-allowed opacity-50' : 'text-corporate-primary hover:bg-corporate-primary/10 active:scale-95'"><i class="material-icons text-xs">arrow_back_ios</i> Anterior</button>
+                    <span class="text-[10px] text-transparent mt-1.5 select-none hidden sm:block">spacer</span>
+                </div>
+                <div class="flex gap-3 order-first sm:order-none mb-2 sm:mb-0">
+                    <button v-for="(slide, index) in slides" :key="index" @click="goToSlide(index)" class="w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none" :class="index === currentSlide ? 'bg-corporate-primary scale-125' : 'bg-gray-300 hover:bg-corporate-secondary'"></button>
+                </div>
+                <div class="flex flex-col items-center sm:items-end w-full sm:w-auto">
+                    <button v-if="!isLastSlide" @click="nextSlide" class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-semibold bg-corporate-primary text-white hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95">Avanzar <i class="material-icons text-xs">arrow_forward_ios</i></button>
+                    <button v-else @click="finishPresentation" class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95">Finalizar <i class="material-icons text-xs">check_circle</i></button>
+                    <span class="text-[10px] text-gray-500 font-medium mt-1.5 tracking-wider select-none">{{ currentSlide + 1 }} de {{ slides.length }}</span>
+                </div>
+            </div>
+        </div>
+        <p class="absolute bottom-2 sm:bottom-4 left-0 right-0 text-center text-corporate-secondary opacity-90 text-[10px] sm:text-xs font-medium tracking-wide">Compensación T&C Colombia</p>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                currentSlide: 0,
+                showThankYou: false,
+                slides: [
+                    {
+                        isCover: true,
+                        title: 'Plan de Lanzamiento',
+                        department: 'Mi Retribución Variable by COCO – RED',
+                        date: '',
+                        content: `
+                            <div class="coco-sensor-stage mx-auto">
+                                <span class="coco-sensor-ring"></span>
+                                <span class="coco-sensor-ring"></span>
+                                <span class="coco-sensor-ring"></span>
+                                <div class="coco-sensor-image">
+                                    <div class="drive-image-container relative w-full h-full flex items-center justify-center bg-[#F0F7FF]"
+                                         data-image-input="https://drive.google.com/file/d/1nEhLHharviQ_Rl4hLHG6owx2OzwA5LDo/view?usp=drive_link">
+                                        <i class="material-icons text-5xl text-[#85C8FF] animate-pulse">smart_toy</i>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        isIndex: true,
+                        title: 'Nuestro plan de lanzamiento',
+                        items: [
+                            'Ecosistema de lanzamiento',
+                            'Despliegue y comunicación',
+                            'Activación y formación',
+                            'Coordinación del lanzamiento',
+                            'Materiales de lanzamiento'
+                        ]
+                    },
+                    {
+                        stepNumber: '1',
+                        title: 'Ecosistema de lanzamiento',
+                        content: `
+                            <div class="grid grid-cols-12 gap-5">
+                                <div class="col-span-12 sm:col-span-7 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-5">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">dashboard</i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-bold text-corporate-primary">Mi Retribución Variable</h3>
+                                            <p class="text-xs text-gray-500">Canal principal para la RED</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white rounded-xl border border-blue-100 shadow-sm p-5">
+                                        <div class="flex justify-between items-start gap-3">
+                                            <div>
+                                                <p class="text-[11px] uppercase tracking-widest text-gray-400 font-bold mb-2">Experiencia del colaborador</p>
+                                                <h4 class="text-xl font-bold text-corporate-dark mb-2">Mi Retribución Variable</h4>
+                                                <p class="text-xs text-gray-500 max-w-xs">Consulta del detalle monetario de pagos, liquidaciones y reliquidaciones.</p>
+                                            </div>
+                                            <i class="material-icons text-4xl text-[#85C8FF]">account_balance_wallet</i>
+                                        </div>
+                                        <div class="mt-5 flex items-center justify-between gap-3 border-t border-gray-100 pt-4">
+                                            <a href="https://script.google.com/a/macros/bbva.com/s/AKfycbzPoa4GAx76FdiGsCF5SY1X7dIrWYMndm4-fLwQkYo2xQGn0PPX3Eo3qQneRgvJONETMA/exec?action=retribucion"
+                                               target="_blank" rel="noopener noreferrer"
+                                               class="inline-flex items-center gap-2 rounded-lg bg-corporate-primary text-white px-4 py-2.5 text-xs font-semibold hover:bg-blue-800 transition-colors cursor-pointer">
+                                                Acceder al módulo
+                                                <i class="material-icons text-sm">open_in_new</i>
+                                            </a>
+                                            <a href="https://script.google.com/a/macros/bbva.com/s/AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec"
+                                               target="_blank" rel="noopener noreferrer"
+                                               title="Abrir Consultor COCO"
+                                               class="flex flex-col items-center gap-1 text-corporate-primary hover:scale-105 transition-transform cursor-pointer">
+                                                <span class="w-14 h-14 bg-[#E6F3FF] rounded-xl flex items-center justify-center border border-[#85C8FF]">
+                                                    <img src="https://thisfor90s.github.io/cdn_images_for90s/coco_noback_front.png" alt="COCO" class="w-12 h-12 object-contain" />
+                                                </span>
+                                                <span class="text-[10px] font-bold">COCO</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-center gap-2 mt-3 text-corporate-primary">
+                                        <i class="material-icons text-sm">south</i>
+                                        <span class="text-xs font-medium">Al hacer clic en COCO dentro del módulo, se abre su Site de asesoría</span>
+                                    </div>
+                                    <div class="mt-3 rounded-xl bg-white border border-blue-100 p-3 flex items-center gap-3">
+                                        <i class="material-icons text-2xl text-corporate-primary">support_agent</i>
+                                        <div class="flex-1">
+                                            <p class="text-sm font-bold">Site de Agentes de Compensación</p>
+                                            <p class="text-xs text-gray-500">Consultor COCO</p>
+                                        </div>
+                                        <a href="https://script.google.com/a/macros/bbva.com/s/AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec"
+                                           target="_blank" rel="noopener noreferrer"
+                                           class="text-corporate-primary hover:bg-blue-50 rounded-lg p-2 cursor-pointer"
+                                           title="Abrir Consultor COCO">
+                                            <i class="material-icons">open_in_new</i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-span-12 sm:col-span-5 rounded-2xl bg-gray-50 border border-gray-100 p-5">
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">campaign</i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-bold text-corporate-primary">AACC</h3>
+                                            <p class="text-xs text-gray-500">Activación de comunicación</p>
+                                        </div>
+                                    </div>
+                                    <div class="bg-white rounded-xl p-5 border border-gray-100">
+                                        <div class="flex items-center gap-3 mb-4">
+                                            <i class="material-icons text-3xl text-[#85C8FF]">article</i>
+                                            <h4 class="text-lg font-bold text-corporate-dark">Al Día</h4>
+                                        </div>
+                                        <p class="text-sm text-gray-600 leading-relaxed">Proponer comunicación Al Día a comienzos de enero, antes del pico de consultas de febrero y marzo por incentivación anual. Incorporar también el enlace de COCO en las comunicaciones individuales de incentivación, cuando corresponda.</p>
+                                        <div class="mt-5 border-t border-gray-100 pt-4">
+                                            <span class="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
+                                                <i class="material-icons text-sm">pending_actions</i>
+                                                Propuesta por validar
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-span-12 bg-[#EAF5FF] rounded-xl px-5 py-3 flex items-center gap-3">
+                                    <i class="material-icons text-corporate-primary">lightbulb</i>
+                                    <p class="text-sm font-semibold text-corporate-primary">Apalancar Mi Retribución Variable como punto de entrada para conocer y utilizar Consultor COCO.</p>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        stepNumber: '2',
+                        title: 'Plan de despliegue | Visibilidad y comunicación',
+                        content: `
+                            <div class="w-full">
+                                <div class="flex items-center justify-between mb-3 px-2">
+                                    <p class="text-xs text-gray-600 font-medium">Cuatro iniciativas para habilitar el acceso y dar visibilidad a la solución</p>
+                                    <span class="text-[10px] uppercase tracking-wider font-bold text-gray-500">Fecha prevista</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 p-3">
+                                        <div class="w-10 h-10 shrink-0 rounded-xl bg-[#E8F4FF] flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">language</i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-bold">01 · Portales corporativos</h3>
+                                            <p class="text-xs text-gray-600">Portal Tú · Portal SAE · Portal Incentivación (Performance) · Baúl del Manager (por validar con su equipo responsable).</p>
+                                        </div>
+                                        <input type="date" aria-label="Fecha portales" data-activity-date="portales" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['portales']=this.value" onfocus="this.value=(window.__cocoDates||{})['portales']||this.value" class="w-[145px] shrink-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                    <div class="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 p-3">
+                                        <div class="w-10 h-10 shrink-0 rounded-xl bg-[#E8F4FF] flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">smart_toy</i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-bold">02 · COCO en Mi Retribución Variable</h3>
+                                            <p class="text-xs text-gray-600">Incluir el acceso directo a Consultor COCO dentro del módulo.</p>
+                                        </div>
+                                        <input type="date" aria-label="Fecha integración COCO" data-activity-date="integracion" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['integracion']=this.value" onfocus="this.value=(window.__cocoDates||{})['integracion']||this.value" class="w-[145px] shrink-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                    <div class="flex items-center gap-3 rounded-xl bg-gray-50 border border-gray-100 p-3">
+                                        <div class="w-10 h-10 shrink-0 rounded-xl bg-[#E8F4FF] flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">mail_outline</i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-bold">03 · Firmas corporativas</h3>
+                                            <p class="text-xs text-gray-600">Banner de Consultor COCO en las firmas del Front y Compensación.</p>
+                                        </div>
+                                        <input type="date" aria-label="Fecha banners" data-activity-date="firmas" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['firmas']=this.value" onfocus="this.value=(window.__cocoDates||{})['firmas']||this.value" class="w-[145px] shrink-0 rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                    <div class="flex items-center gap-3 rounded-xl bg-[#EAF5FF] border border-[#CFE8FF] p-3">
+                                        <div class="w-10 h-10 shrink-0 rounded-xl bg-white flex items-center justify-center">
+                                            <i class="material-icons text-corporate-primary">campaign</i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="text-sm font-bold text-corporate-primary">04 · Comunicación oficial a toda la RED</h3>
+                                            <p class="text-xs text-gray-600">Pieza única desde Talento y Cultura: acceso, utilidad y presentación de COCO. Difusión complementaria en Comunica Incentivación.</p>
+                                        </div>
+                                        <input type="date" aria-label="Fecha comunicación oficial" data-activity-date="comunicacion" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['comunicacion']=this.value" onfocus="this.value=(window.__cocoDates||{})['comunicacion']||this.value" class="w-[145px] shrink-0 rounded-lg border border-blue-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-4 flex items-center gap-2">
+                                    <i class="material-icons text-sm">event</i>
+                                    Fechas por acordar durante la planificación del lanzamiento.
+                                </p>
+                            </div>
+                        `
+                    },
+                    {
+                        stepNumber: '3',
+                        title: 'Activación con líderes y equipos de atención',
+                        content: `
+                            <div class="grid grid-cols-12 gap-5">
+                                <div class="col-span-12 sm:col-span-6 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-6 flex flex-col">
+                                    <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-4">
+                                        <i class="material-icons text-3xl text-corporate-primary">groups</i>
+                                    </div>
+                                    <span class="text-xs font-bold text-corporate-primary tracking-widest">06 · ACTIVACIÓN</span>
+                                    <h3 class="text-xl font-bold text-corporate-dark mt-2 mb-3">Líderes de la RED</h3>
+                                    <p class="text-sm text-gray-600 leading-relaxed">Solicitar espacio en sesiones con directores de zona y, si es posible, gerentes de oficina.</p>
+                                    <div class="bg-white border border-blue-100 rounded-xl p-4 mt-5">
+                                        <p class="text-xs font-bold text-corporate-primary mb-2">¿Qué mostraremos?</p>
+                                        <p class="text-xs text-gray-600 leading-relaxed">El detalle de la retribución variable, el acceso a Consultor COCO y su utilidad para los colaboradores.</p>
+                                    </div>
+                                    <div class="mt-5 pt-4 border-t border-blue-100 flex items-center justify-between gap-3">
+                                        <span class="text-xs font-medium text-gray-500">Fecha prevista</span>
+                                        <input type="date" aria-label="Fecha sesión líderes" data-activity-date="lideres" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['lideres']=this.value" onfocus="this.value=(window.__cocoDates||{})['lideres']||this.value" class="w-[155px] rounded-lg border border-blue-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                </div>
+                                <div class="col-span-12 sm:col-span-6 rounded-2xl bg-gray-50 border border-gray-100 p-6 flex flex-col">
+                                    <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-4">
+                                        <i class="material-icons text-3xl text-corporate-primary">school</i>
+                                    </div>
+                                    <span class="text-xs font-bold text-corporate-primary tracking-widest">07 · FORMACIÓN</span>
+                                    <h3 class="text-xl font-bold text-corporate-dark mt-2 mb-3">Capacitación al Front</h3>
+                                    <p class="text-sm text-gray-600 leading-relaxed">Realizar una sesión específica con mayor profundidad sobre las herramientas y su uso.</p>
+                                    <div class="bg-white border border-gray-100 rounded-xl p-4 mt-5">
+                                        <p class="text-xs font-bold text-corporate-primary mb-2">¿En qué profundizaremos?</p>
+                                        <p class="text-xs text-gray-600 leading-relaxed">Navegación, funcionalidades, orientación con COCO y canales para las consultas de colaboradores.</p>
+                                    </div>
+                                    <div class="mt-5 pt-4 border-t border-gray-200 flex items-center justify-between gap-3">
+                                        <span class="text-xs font-medium text-gray-500">Fecha prevista</span>
+                                        <input type="date" aria-label="Fecha formación Front" data-activity-date="front" onchange="window.__cocoDates=window.__cocoDates||{};window.__cocoDates['front']=this.value" onfocus="this.value=(window.__cocoDates||{})['front']||this.value" class="w-[155px] rounded-lg border border-gray-200 bg-white px-2 py-2 text-xs text-gray-600 focus:outline-none focus:border-[#85C8FF]">
+                                    </div>
+                                </div>
+                                <div class="col-span-12 bg-[#EAF5FF] rounded-xl p-4 flex items-center gap-3">
+                                    <i class="material-icons text-corporate-primary">tips_and_updates</i>
+                                    <p class="text-sm font-medium text-corporate-primary">Conocer la solución, comprender su valor y facilitar su adopción en la RED.</p>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        stepNumber: '4',
+                        title: 'Coordinación del lanzamiento',
+                        content: `
+                            <div class="grid grid-cols-12 gap-4 mb-5">
+                                <div class="col-span-12 sm:col-span-4 rounded-xl bg-gray-50 border border-gray-100 p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-xs font-bold text-gray-400">01 · PREPARACIÓN</span>
+                                        <i class="material-icons text-corporate-primary">settings_suggest</i>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-corporate-dark mb-2">Habilitar</h3>
+                                    <p class="text-xs text-gray-600 leading-relaxed">Validar accesos, integraciones, piezas de comunicación y coordinación entre equipos.</p>
+                                </div>
+                                <div class="col-span-12 sm:col-span-4 rounded-xl bg-[#EAF5FF] border border-[#CFE8FF] p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-xs font-bold text-corporate-primary">02 · LANZAMIENTO</span>
+                                        <i class="material-icons text-corporate-primary">rocket_launch</i>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-corporate-dark mb-2">Comunicar</h3>
+                                    <p class="text-xs text-gray-600 leading-relaxed">Activar la comunicación oficial desde T&C y los canales de difusión acordados.</p>
+                                </div>
+                                <div class="col-span-12 sm:col-span-4 rounded-xl bg-gray-50 border border-gray-100 p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <span class="text-xs font-bold text-gray-400">03 · REFUERZO</span>
+                                        <i class="material-icons text-corporate-primary">diversity_3</i>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-corporate-dark mb-2">Acompañar</h3>
+                                    <p class="text-xs text-gray-600 leading-relaxed">Sesiones con líderes, capacitación al Front y refuerzo del conocimiento de COCO.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-gray-200 rounded-xl p-5">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <i class="material-icons text-corporate-primary">fact_check</i>
+                                    <h3 class="text-base font-bold text-corporate-primary">Definiciones para coordinar</h3>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 accent-[#001391]">
+                                        <span class="text-xs font-medium">Fecha objetivo del lanzamiento oficial</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 accent-[#001391]">
+                                        <span class="text-xs font-medium">Validación de la comunicación desde T&C</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 accent-[#001391]">
+                                        <span class="text-xs font-medium">Confirmación de espacios con líderes</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 bg-gray-50 rounded-lg px-4 py-3 cursor-pointer">
+                                        <input type="checkbox" class="w-4 h-4 accent-[#001391]">
+                                        <span class="text-xs font-medium">Coordinación con AACC y Performance</span>
+                                    </label>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        stepNumber: '5',
+                        title: 'Materiales de lanzamiento',
+                        content: `
+                            <div class="grid grid-cols-12 gap-4 items-stretch">
+                                <div class="col-span-12 sm:col-span-5 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-4">
+                                    <h3 class="font-bold text-corporate-primary text-sm mb-2">Comunicación corporativa a la RED</h3>
+                                    <a href="https://script.google.com/a/bbva.com/macros/s/AKfycbwSEH5-qxsEPzf-uPZX89gfSfuAwwlKud8XbpKGcfE4pi51KTfCZbuEBcDgAheWx-S6/exec?slide=ppt_1792769398718" target="_blank" rel="noopener noreferrer" class="block bg-white rounded-xl border border-blue-100 p-2 text-center cursor-pointer" title="Abrir pieza web en una nueva pestaña">
+                                        <div class="drive-image-container h-[330px] w-full flex items-center justify-center" data-image-input="https://drive.google.com/file/d/1UUwaBIUAEWO9vbRHbJAEDQmlNSHz3Kbc/view?usp=sharing">
+                                            <i class="material-icons text-4xl text-[#85C8FF] animate-pulse">image</i>
+                                        </div>
+                                    </a>
+                                    <p class="text-[11px] text-corporate-primary mt-2 font-semibold text-center">Haz clic para abrir la versión web ↗</p>
+                                </div>
+                                <div class="col-span-12 sm:col-span-7 flex flex-col gap-3">
+                                    <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4">
+                                        <h3 class="font-bold text-corporate-primary text-sm mb-3">Banner de firmas · Front y Compensación</h3>
+                                        <img src="https://thisfor90s.github.io/cdn_images_for90s/banner_coco_1.png" alt="Banner corporativo Consultor COCO" class="w-full h-auto object-contain rounded-lg" />
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 flex-1">
+                                        <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
+                                            <i class="material-icons text-3xl text-corporate-primary">groups</i>
+                                            <p class="text-sm font-bold text-corporate-primary">Presentación RED</p>
+                                            <p class="text-xs text-gray-600">Espacio reservado</p>
+                                        </div>
+                                        <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
+                                            <i class="material-icons text-3xl text-corporate-primary">school</i>
+                                            <p class="text-sm font-bold text-corporate-primary">Presentación Front</p>
+                                            <p class="text-xs text-gray-600">Espacio reservado</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    }
+                ]
+            },
+            computed: {
+                isFirstSlide() { return this.currentSlide === 0; },
+                isLastSlide() { return this.currentSlide === this.slides.length - 1; },
+                computedDate() {
+                    const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                    const d = new Date();
+                    return months[d.getMonth()] + ' ' + d.getFullYear();
+                },
+                hasIndex() { return this.slides.findIndex(s => s.isIndex) !== -1; },
+                indexSlidePosition() { return this.slides.findIndex(s => s.isIndex); }
+            },
+            methods: {
+                nextSlide() { if (!this.isLastSlide) this.currentSlide++; },
+                prevSlide() { if (!this.isFirstSlide) this.currentSlide--; },
+                goToSlide(index) { this.currentSlide = index; },
+                finishPresentation() { this.showThankYou = true; },
+                closeThankYou() { this.showThankYou = false; this.currentSlide = 0; },
+                navigateFromIndex(idx) {
+                    const targetSlide = this.indexSlidePosition + 1 + idx;
+                    if(this.slides[targetSlide]) { this.currentSlide = targetSlide; }
+                },
+                returnToIndex() {
+                    if (this.hasIndex) { this.currentSlide = this.indexSlidePosition; }
+                }
+            },
+            updated() {
+                // Conserva las fechas durante la navegación sin almacenamiento persistente.
+                this.$nextTick(() => {
+                    document.querySelectorAll('[data-activity-date]').forEach(el => {
+                        const value = (window.__cocoDates || {})[el.getAttribute('data-activity-date')];
+                        if (value && el.value !== value) el.value = value;
+                    });
+                });
+            },
+            mounted() {
+                // Pre-carga silenciosa de imágenes al inicializar la app
+                this.slides.forEach((slide, index) => {
+                    if (!slide.content) return;
+
+                    // 1. Usamos un DOM virtual para buscar contenedores sin renderizarlos
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = slide.content;
+                    const containers = tempDiv.querySelectorAll('.drive-image-container');
+
+                    containers.forEach(container => {
+                        const inputValue = container.getAttribute('data-image-input');
+                        if (!inputValue) return;
+
+                        // 2. Llamado asíncrono al backend
+                        google.script.run
+                            .withSuccessHandler((res) => {
+                                // 3. Al volver, reconstruimos el HTML de la lámina específica
+                                const updaterDiv = document.createElement('div');
+                                updaterDiv.innerHTML = this.slides[index].content;
+                                const target = updaterDiv.querySelector('.drive-image-container[data-image-input="' + inputValue + '"]');
+
+                                if (target) {
+                                    if (res.success && res.base64) {
+                                        target.outerHTML = '<img src="' + res.base64 + '" alt="Pieza de comunicación a la RED" class="w-full h-full object-contain transition-opacity duration-500" />';
+                                    } else {
+                                        target.outerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl shadow-inner"><i class="material-icons text-gray-400 text-4xl">broken_image</i></div>';
+                                    }
+                                    // 4. this.$set garantiza que Vue re-renderice si el usuario ya está viendo esta lámina
+                                    this.$set(this.slides[index], 'content', updaterDiv.innerHTML);
+                                }
+                            })
+                            .withFailureHandler(() => {
+                                const updaterDiv = document.createElement('div');
+                                updaterDiv.innerHTML = this.slides[index].content;
+                                const target = updaterDiv.querySelector('.drive-image-container[data-image-input="' + inputValue + '"]');
+
+                                if (target) {
+                                    target.outerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-xl shadow-inner"><i class="material-icons text-gray-400 text-4xl">image_not_supported</i></div>';
+                                    this.$set(this.slides[index], 'content', updaterDiv.innerHTML);
+                                }
+                            })
+                            .processImageToBase64(inputValue);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
