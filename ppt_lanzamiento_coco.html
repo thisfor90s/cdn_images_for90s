@@ -128,7 +128,7 @@
                     BBV<span class="inline-block transform rotate-180 translate-y-[1px] ml-[1px]">V</span>
                 </div>
 
-                <transition name="slide-fade" mode="out-in">
+                <transition name="slide-fade" mode="out-in" @after-enter="renderFrontMRVImage">
                     <div v-if="slides[currentSlide].isCover" :key="'cover-' + currentSlide" class="w-full max-w-5xl mx-auto flex flex-col items-start justify-center text-left py-10 relative z-10 h-full">
                         <div class="w-full grid grid-cols-12 gap-5 items-center">
                             <div class="col-span-12 sm:col-span-7">
@@ -144,7 +144,14 @@
                         </div>
                     </div>
 
-                    <div v-else-if="slides[currentSlide].isIndex" :key="'index-' + currentSlide" class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
+                    <div v-else-if="slides[currentSlide].isSection" :key="'section-' + currentSlide" class="w-full max-w-5xl mx-auto flex flex-col items-center justify-center text-center py-10 relative z-10 h-full">
+                    <div class="w-28 h-28 rounded-full bg-[#EAF5FF] border border-[#CFE8FF] flex items-center justify-center mb-7"><i class="material-icons text-6xl text-corporate-primary">{{ slides[currentSlide].icon || 'support_agent' }}</i></div>
+                    <h2 class="text-4xl sm:text-6xl font-black text-corporate-dark leading-tight mb-5">{{ slides[currentSlide].title }}</h2>
+                    <p class="text-base sm:text-xl text-gray-500 font-medium max-w-3xl">{{ slides[currentSlide].subtitle }}</p>
+                    <div class="w-28 h-1.5 rounded-full bg-gradient-to-r from-corporate-primary to-corporate-secondary mt-9"></div>
+                </div>
+
+                <div v-else-if="slides[currentSlide].isIndex" :key="'index-' + currentSlide" class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
                         <h2 class="text-2xl sm:text-4xl font-bold text-corporate-primary mb-10 border-b border-gray-200 pb-4">{{ slides[currentSlide].title }}</h2>
                         <div class="flex flex-col gap-6 max-w-3xl pl-2 sm:pl-4">
                             <div v-for="(item, idx) in slides[currentSlide].items" :key="idx" class="flex items-center gap-5 sm:gap-6 group">
@@ -202,11 +209,46 @@
             return false;
         }
 
+        
+        function abrirPresentacionRED() {
+
+            const url =
+                'https:' + '/' + '/' +
+                'script.google.com/a/bbva.com/macros/s/' +
+                'AKfycbwSEH5-qxsEPzf-uPZX89gfSfuAwwlKud8XbpKGcfE4pi51KTfCZbuEBcDgAheWx-S6/' +
+                'exec?slide=ppt_1792798087299';
+
+            window.open(
+                url,
+                '_blank',
+                'noopener,noreferrer'
+            );
+        }
+
+
+        function abrirRecursoFront(destino) {
+            const base = 'https:' + '/' + '/' + 'script.google.com/a/macros/bbva.com/s/';
+            const rutas = {
+                mrv: base + 'AKfycbzPoa4GAx76FdiGsCF5SY1X7dIrWYMndm4-fLwQkYo2xQGn0PPX3Eo3qQneRgvJONETMA/exec?action=retribucion',
+                coco: base + 'AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec'
+            };
+            if (!rutas[destino]) return;
+            const enlace = document.createElement('a');
+            enlace.href = rutas[destino];
+            enlace.target = '_blank';
+            enlace.rel = 'noopener noreferrer';
+            document.body.appendChild(enlace);
+            enlace.click();
+            enlace.remove();
+        }
+
         new Vue({
             el: '#app',
             data: {
                 currentSlide: 0,
                 showThankYou: false,
+                frontMrvBase64: '',
+                frontMrvImageError: false,
                 slides: [
                     {
                         isCover: true,
@@ -515,11 +557,34 @@
                                         </a>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3 flex-1">
-                                        <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
-                                            <i class="material-icons text-3xl text-corporate-primary">groups</i>
-                                            <p class="text-sm font-bold text-corporate-primary">Presentación RED</p>
-                                            <p class="text-xs text-gray-600">Espacio reservado</p>
+                                        
+                                        <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-3 flex flex-col items-center text-center gap-2">
+
+                                            <h3 class="text-sm font-bold text-corporate-primary">
+                                                Presentación RED
+                                            </h3>
+
+                                            <button
+                                                type="button"
+                                                onclick="abrirPresentacionRED()"
+                                                title="Abrir presentación de Mi Retribución Variable para la RED"
+                                                class="w-full flex flex-col items-center gap-2 cursor-pointer">
+
+                                                <img
+                                                    src="${'https:' + '/' + '/' + 'thisfor90s.github.io/cdn_images_for90s/portada_coco_red_ppt.png'}"
+                                                    alt="Portada de la presentación Mi Retribución Variable para la RED"
+                                                    class="w-full h-[175px] object-contain rounded-lg"
+                                                    style="display:block;"
+                                                />
+
+                                                <span class="text-[11px] font-semibold text-corporate-primary">
+                                                    Abrir presentación ↗
+                                                </span>
+
+                                            </button>
+
                                         </div>
+
                                         <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
                                             <i class="material-icons text-3xl text-corporate-primary">school</i>
                                             <p class="text-sm font-bold text-corporate-primary">Presentación Front</p>
@@ -528,6 +593,375 @@
                                     </div>
                                 </div>
                             </div>
+                        `
+                    },
+                    {
+                        isSection: true,
+                        title: 'Capacitación al Front',
+                        subtitle: 'Mi Retribución Variable y Consultor COCO · Herramientas para acompañar a nuestra RED',
+                        icon: 'support_agent'
+                    },
+                    
+                    {
+                        stepNumber: '6',
+                        title: 'MRV | Consulta de pagos para el Front',
+                        content: `
+
+                            <div style="width:100%;">
+
+                                <!-- MENSAJE INTRODUCTORIO -->
+
+                                <p style="
+                                    font-size:14px;
+                                    line-height:1.5;
+                                    color:#667085;
+                                    margin:0 0 18px 0;
+                                ">
+                                    Información disponible para orientar al colaborador,
+                                    de acuerdo con el perfil autorizado.
+                                </p>
+
+                                <!-- CONTENEDOR PRINCIPAL -->
+
+                                <div style="
+                                    display:grid;
+                                    grid-template-columns:minmax(0,65fr) minmax(0,35fr);
+                                    gap:18px;
+                                    width:100%;
+                                    align-items:stretch;
+                                ">
+
+                                    <!-- COLUMNA IZQUIERDA: MRV -->
+
+                                    <div style="
+                                        min-width:0;
+                                        background:#F0F7FF;
+                                        border:1px solid #D9EAFF;
+                                        border-radius:18px;
+                                        padding:16px;
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:12px;
+                                        box-sizing:border-box;
+                                    ">
+
+                                        <div style="
+                                            display:flex;
+                                            align-items:center;
+                                            gap:10px;
+                                        ">
+
+                                            <i class="material-icons"
+                                            style="color:#001391;font-size:23px;">
+                                                dashboard
+                                            </i>
+
+                                            <h3 style="
+                                                font-size:16px;
+                                                font-weight:700;
+                                                color:#001391;
+                                                margin:0;
+                                            ">
+                                                Mi Retribución Variable
+                                            </h3>
+
+                                        </div>
+
+                                        <!-- CAPTURA MRV -->
+
+                                        <div style="
+                                            width:100%;
+                                            min-width:0;
+                                            background:#FFFFFF;
+                                            border:1px solid #D9EAFF;
+                                            border-radius:12px;
+                                            padding:10px;
+                                            box-sizing:border-box;
+                                            display:flex;
+                                            align-items:center;
+                                            justify-content:center;
+                                        ">
+
+                                            <div
+                                                class="front-mrv-image-slot"
+                                                data-image-input="https://drive.google.com/file/d/1Oy_kMzgjM1t92qQWXslRoaElzWlX8cRb/view?usp=drive_link"
+                                                style="
+                                                    width:100%;
+                                                    min-width:0;
+                                                    min-height:220px;
+                                                    display:flex;
+                                                    align-items:center;
+                                                    justify-content:center;
+                                                ">
+
+                                                <div style="
+                                                    text-align:center;
+                                                    color:#98A2B3;
+                                                    padding:30px 10px;
+                                                ">
+
+                                                    <i class="material-icons"
+                                                    style="font-size:34px;">
+                                                        image
+                                                    </i>
+
+                                                    <p style="
+                                                        font-size:12px;
+                                                        margin-top:8px;
+                                                    ">
+                                                        Cargando captura de MRV...
+                                                    </p>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- BOTÓN DE ACCESO -->
+
+                                        <button
+                                            type="button"
+                                            onclick="abrirRecursoFront('mrv')"
+                                            style="
+                                                display:block;
+                                                width:100%;
+                                                min-height:46px;
+                                                flex:0 0 auto;
+                                                background:#001391;
+                                                color:#FFFFFF;
+                                                border:0;
+                                                border-radius:10px;
+                                                padding:12px 16px;
+                                                font-family:Inter,Arial,sans-serif;
+                                                font-size:13px;
+                                                font-weight:700;
+                                                text-align:center;
+                                                cursor:pointer;
+                                                box-sizing:border-box;
+                                                white-space:normal;
+                                            ">
+
+                                            Ir a Mi Retribución Variable ↗
+
+                                        </button>
+
+                                    </div>
+
+                                    <!-- COLUMNA DERECHA: FUNCIONALIDADES -->
+
+                                    <div style="
+                                        min-width:0;
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:12px;
+                                        box-sizing:border-box;
+                                    ">
+
+                                        <!-- FUNCIONALIDAD 1 -->
+
+                                        <div style="
+                                            background:#F8F9FA;
+                                            border:1px solid #EAECF0;
+                                            border-radius:14px;
+                                            padding:16px;
+                                            box-sizing:border-box;
+                                            flex:1 1 0;
+                                        ">
+
+                                            <div style="
+                                                display:flex;
+                                                align-items:center;
+                                                gap:10px;
+                                                margin-bottom:8px;
+                                            ">
+
+                                                <i class="material-icons"
+                                                style="color:#001391;font-size:24px;">
+                                                    manage_search
+                                                </i>
+
+                                                <strong style="
+                                                    color:#070E46;
+                                                    font-size:14px;
+                                                ">
+                                                    Consulta por colaborador
+                                                </strong>
+
+                                            </div>
+
+                                            <p style="
+                                                color:#667085;
+                                                font-size:12px;
+                                                line-height:1.5;
+                                                margin:0;
+                                            ">
+                                                El perfil Front habilita la consulta
+                                                del detalle de pagos.
+                                            </p>
+
+                                        </div>
+
+                                        <!-- FUNCIONALIDAD 2 -->
+
+                                        <div style="
+                                            background:#F8F9FA;
+                                            border:1px solid #EAECF0;
+                                            border-radius:14px;
+                                            padding:16px;
+                                            box-sizing:border-box;
+                                            flex:1 1 0;
+                                        ">
+
+                                            <div style="
+                                                display:flex;
+                                                align-items:center;
+                                                gap:10px;
+                                                margin-bottom:8px;
+                                            ">
+
+                                                <i class="material-icons"
+                                                style="color:#001391;font-size:24px;">
+                                                    date_range
+                                                </i>
+
+                                                <strong style="
+                                                    color:#070E46;
+                                                    font-size:14px;
+                                                ">
+                                                    Períodos y filtros
+                                                </strong>
+
+                                            </div>
+
+                                            <p style="
+                                                color:#667085;
+                                                font-size:12px;
+                                                line-height:1.5;
+                                                margin:0;
+                                            ">
+                                                Mes de pago y período de ejecución.
+                                            </p>
+
+                                        </div>
+
+                                        <!-- FUNCIONALIDAD 3 -->
+
+                                        <div style="
+                                            background:#F8F9FA;
+                                            border:1px solid #EAECF0;
+                                            border-radius:14px;
+                                            padding:16px;
+                                            box-sizing:border-box;
+                                            flex:1 1 0;
+                                        ">
+
+                                            <div style="
+                                                display:flex;
+                                                align-items:center;
+                                                gap:10px;
+                                                margin-bottom:8px;
+                                            ">
+
+                                                <i class="material-icons"
+                                                style="color:#001391;font-size:24px;">
+                                                    receipt_long
+                                                </i>
+
+                                                <strong style="
+                                                    color:#070E46;
+                                                    font-size:14px;
+                                                ">
+                                                    Detalle monetario
+                                                </strong>
+
+                                            </div>
+
+                                            <p style="
+                                                color:#667085;
+                                                font-size:12px;
+                                                line-height:1.5;
+                                                margin:0;
+                                            ">
+                                                Liquidaciones, reliquidaciones y factores.
+                                            </p>
+
+                                        </div>
+
+                                        <!-- MENSAJE DE ORIENTACIÓN -->
+
+                                        <div style="
+                                            background:#EAF5FF;
+                                            border:1px solid #D9EAFF;
+                                            border-radius:12px;
+                                            padding:12px 14px;
+                                            box-sizing:border-box;
+                                            flex:0 0 auto;
+                                        ">
+
+                                            <p style="
+                                                color:#001391;
+                                                font-size:11px;
+                                                font-weight:600;
+                                                line-height:1.45;
+                                                margin:0;
+                                            ">
+                                                Consultar y orientar no implica
+                                                modificar pagos ni resolver reclamaciones.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        `
+                    },
+
+                    {
+                        stepNumber: '7',
+                        title: 'Consultor COCO | Dos asistentes, dos públicos',
+                        content: `
+                            <div class="grid grid-cols-12 gap-5 items-stretch">
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-[#EAF5FF] border border-[#D9EAFF] p-5 flex flex-col items-center justify-center text-center">
+                                    <img src="${'https:' + '/' + '/' + 'thisfor90s.github.io/cdn_images_for90s/coco_noback_dream.png'}" alt="Consultor COCO" class="w-full max-w-[165px] object-contain" style="max-height:245px;display:block;" />
+                                    <p class="font-bold text-corporate-primary mt-3">Tu aliado especializado</p>
+                                </div>
+                                <div class="col-span-12 sm:col-span-8 flex flex-col gap-4">
+                                    <div class="rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-5"><div class="flex items-center gap-3 mb-2"><i class="material-icons text-corporate-primary text-3xl">people</i><h3 class="text-lg font-bold text-corporate-primary">COCO para colaboradores</h3></div><p class="text-sm text-gray-600">Asistente conversacional especializado en la Política de Retribución Variable para orientar a la RED.</p></div>
+                                    <div class="rounded-2xl bg-gray-50 border border-gray-100 p-5"><div class="flex items-center gap-3 mb-2"><i class="material-icons text-corporate-primary text-3xl">support_agent</i><h3 class="text-lg font-bold text-corporate-primary">Consultor COCO Front</h3></div><p class="text-sm text-gray-600">Asistente de ChatGPT para apoyar al Front en la preparación de respuestas a consultas de colaboradores.</p></div>
+                                    <button type="button" onclick="abrirRecursoFront('coco')" class="rounded-lg bg-corporate-primary text-white px-4 py-3 text-sm font-bold hover:bg-blue-800 cursor-pointer">Abrir Site Consultor COCO ↗</button>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        stepNumber: '8',
+                        title: 'Consultor COCO Front | Cómo comenzar',
+                        content: `
+                            <p class="text-sm text-gray-600 mb-5">Tres formas de acceder, según tu experiencia con el asistente.</p>
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-5"><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-4"><i class="material-icons text-corporate-primary text-3xl">download</i></div><span class="text-xs font-bold text-[#4A8DDE]">01 · PRIMERA VEZ</span><h3 class="text-xl font-bold text-corporate-primary mt-2 mb-3">Instala</h3><p class="text-sm text-gray-600">Abre el asistente desde el Site → <b>Instalar</b> → <b>Probar en Chat</b>.</p></div>
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-gray-50 border border-gray-100 p-5"><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-4"><i class="material-icons text-corporate-primary text-3xl">chat</i></div><span class="text-xs font-bold text-gray-500">02 · PRÓXIMAS VECES</span><h3 class="text-xl font-bold text-corporate-primary mt-2 mb-3">Accede</h3><p class="text-sm text-gray-600">Abre el asistente y selecciona <b>Probar en Chat</b>. No requiere instalar nuevamente.</p></div>
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-[#EAF5FF] border border-[#D9EAFF] p-5"><div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-4"><i class="material-icons text-corporate-primary text-3xl">alternate_email</i></div><span class="text-xs font-bold text-[#4A8DDE]">03 · USO EXPERTO</span><h3 class="text-xl font-bold text-corporate-primary mt-2 mb-3">Invoca</h3><p class="text-sm text-gray-600">En un chat nuevo de ChatGPT escribe <b>@ Consultor COCO Front</b> y selecciónalo.</p></div>
+                            </div>
+                            <div class="mt-5 rounded-xl bg-[#EAF5FF] px-5 py-3 text-xs text-corporate-primary font-semibold">Demostraremos los accesos desde el Site de Consultor COCO y verificaremos las opciones visibles en el entorno corporativo.</div>
+                        `
+                    },
+                    {
+                        stepNumber: '9',
+                        title: 'De la consulta a una mejor orientación',
+                        content: `
+                            <p class="text-sm text-gray-600 mb-5">Caso práctico: un colaborador necesita comprender la composición de su pago.</p>
+                            <div class="grid grid-cols-12 gap-4">
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-5"><i class="material-icons text-4xl text-corporate-primary mb-3">manage_search</i><p class="text-xs font-bold text-[#4A8DDE] mb-2">PASO 1</p><h3 class="text-xl font-bold text-corporate-primary mb-2">Consulta MRV</h3><p class="text-sm text-gray-600">Ubica el pago y revisa su detalle según el perfil autorizado.</p></div>
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-gray-50 border border-gray-100 p-5"><i class="material-icons text-4xl text-corporate-primary mb-3">smart_toy</i><p class="text-xs font-bold text-gray-500 mb-2">PASO 2</p><h3 class="text-xl font-bold text-corporate-primary mb-2">Apóyate en COCO</h3><p class="text-sm text-gray-600">Consulta la política y prepara una explicación clara para el colaborador.</p></div>
+                                <div class="col-span-12 sm:col-span-4 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-5"><i class="material-icons text-4xl text-corporate-primary mb-3">support_agent</i><p class="text-xs font-bold text-[#4A8DDE] mb-2">PASO 3</p><h3 class="text-xl font-bold text-corporate-primary mb-2">Orienta</h3><p class="text-sm text-gray-600">Explica lo disponible o dirige al canal SAE cuando corresponda.</p></div>
+                            </div>
+                            <div class="mt-5 bg-[#EAF5FF] rounded-xl px-5 py-4 text-center"><p class="text-base font-bold text-corporate-primary">Más información, mejores respuestas y una experiencia más cercana para la RED.</p></div>
+                            <div class="flex justify-center gap-3 mt-4"><button type="button" onclick="abrirRecursoFront('mrv')" class="bg-corporate-primary text-white rounded-lg px-5 py-2.5 font-semibold text-xs">Abrir MRV ↗</button><button type="button" onclick="abrirRecursoFront('coco')" class="bg-corporate-primary text-white rounded-lg px-5 py-2.5 font-semibold text-xs">Abrir COCO ↗</button></div>
                         `
                     }
                 ]
@@ -555,6 +989,25 @@
                 },
                 returnToIndex() {
                     if (this.hasIndex) { this.currentSlide = this.indexSlidePosition; }
+                },
+                renderFrontMRVImage() {
+                    const slot = document.querySelector('.front-mrv-image-slot');
+                    if (!slot) return;
+                    if (this.frontMrvBase64) {
+                        let img = slot.querySelector('img[data-front-mrv]');
+                        if (!img) {
+                            img = document.createElement('img');
+                            img.setAttribute('data-front-mrv','true');
+                            img.alt = 'Captura de Mi Retribución Variable';
+                            img.className = 'w-full object-contain rounded-lg';
+                            img.style.maxHeight = '255px';
+                            img.style.display = 'block';
+                            slot.replaceChildren(img);
+                        }
+                        if (img.src !== this.frontMrvBase64) img.src = this.frontMrvBase64;
+                    } else if (this.frontMrvImageError) {
+                        slot.innerHTML = '<div class="text-center text-gray-400 py-6"><i class="material-icons">broken_image</i><p class="text-xs">Imagen no disponible</p></div>';
+                    }
                 }
             },
             
@@ -576,6 +1029,25 @@
             },
 
             mounted() {
+                const inputMRV = 'https://drive.google.com/file/d/1Oy_kMzgjM1t92qQWXslRoaElzWlX8cRb/view?usp=drive_link';
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    google.script.run
+                        .withSuccessHandler(res => {
+                            if (res && res.success && res.base64) {
+                                this.frontMrvBase64 = res.base64;
+                                this.frontMrvImageError = false;
+                            } else {
+                                this.frontMrvImageError = true;
+                            }
+                            this.$nextTick(() => this.renderFrontMRVImage());
+                        })
+                        .withFailureHandler(err => {
+                            console.error('Error Base64 MRV Front:', err);
+                            this.frontMrvImageError = true;
+                            this.$nextTick(() => this.renderFrontMRVImage());
+                        })
+                        .processImageToBase64(inputMRV);
+                }
                 // Pre-carga silenciosa de imágenes al inicializar la app
                 this.slides.forEach((slide, index) => {
                     if (!slide.content) return;
