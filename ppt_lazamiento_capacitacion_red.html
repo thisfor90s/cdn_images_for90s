@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Retribución Variable | Presentación RED</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+    theme: {
+        extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: {
+                corporate: {
+                    primary: '#001391',
+                    secondary: '#85C8FF',
+                    dark: '#070E46'
+                }
+            }
+        }
+    }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+
+<style>
+.slide-fade-enter-active {
+    transition: all .5s ease;
+}
+.slide-fade-leave-active {
+    transition: all .3s cubic-bezier(1,.5,.8,1);
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+    transform: translateX(20px);
+    opacity: 0;
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .5s ease;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+.no-select {
+    user-select: none;
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #85C8FF;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body class="bg-corporate-dark text-white font-sans antialiased h-screen w-screen overflow-hidden">
+
+<div id="app" class="w-full h-full flex flex-col items-center justify-center relative p-4 sm:px-[100px] sm:py-[10px]">
+
+    <div class="bg-white text-corporate-dark w-full h-full rounded-2xl shadow-2xl flex flex-col relative overflow-hidden border border-corporate-secondary/30">
+
+        <transition name="fade">
+            <div v-if="showThankYou" class="absolute inset-0 z-50 bg-white flex flex-col items-center justify-center">
+                <button
+                    @click="closeThankYou"
+                    class="absolute top-6 right-6 p-2 text-gray-400 hover:text-corporate-primary bg-gray-50 hover:bg-corporate-secondary/20 rounded-full transition-all duration-300 focus:outline-none shadow-sm active:scale-95">
+                    <i class="material-icons text-3xl block">close</i>
+                </button>
+
+                <div class="text-center animate-bounce mt-[-20px]" style="animation-duration:2s;">
+                    <i class="material-icons text-6xl text-corporate-secondary mb-4 opacity-50">verified</i>
+                </div>
+
+                <h1 class="text-5xl sm:text-7xl font-bold text-corporate-primary tracking-tight shadow-sm">
+                    ¡Gracias!
+                </h1>
+            </div>
+        </transition>
+
+        <div class="shrink-0 h-2 w-full bg-gradient-to-r from-corporate-primary to-corporate-secondary"></div>
+
+        <div class="flex-grow overflow-y-auto flex flex-col px-6 py-6 sm:px-16 sm:pt-10 sm:pb-12 relative">
+
+            <div class="absolute top-3 right-4 sm:top-5 sm:right-6 z-20 flex items-center text-corporate-primary font-medium text-lg sm:text-xl tracking-tighter select-none pointer-events-none opacity-90">
+                BBV<span class="inline-block transform rotate-180 translate-y-[1px] ml-[1px]">V</span>
+            </div>
+
+            
+            <transition
+                name="slide-fade"
+                mode="out-in"
+                @after-enter="renderMRVImage">
+
+                <div
+                    v-if="slides[currentSlide].isCover"
+                    :key="'cover-' + currentSlide"
+                    class="w-full max-w-5xl mx-auto flex flex-col items-start justify-center text-left py-10 relative z-10 h-full">
+
+                    <div class="w-full grid grid-cols-12 gap-5 items-center">
+
+                        <div class="col-span-12 sm:col-span-7">
+                            <div class="w-16 h-1.5 rounded-full bg-corporate-secondary mb-7"></div>
+
+                            <h1 class="text-4xl sm:text-6xl font-black text-corporate-primary mb-5 tracking-tight leading-tight">
+                                {{ slides[currentSlide].title }}
+                            </h1>
+
+                            <h2 class="text-2xl sm:text-3xl font-bold text-corporate-primary opacity-80 mb-7 leading-snug">
+                                {{ slides[currentSlide].department }}
+                            </h2>
+
+                            <p class="text-sm sm:text-base text-gray-500 font-medium leading-relaxed max-w-md">
+                                {{ slides[currentSlide].subtitle || 'Una nueva experiencia para nuestra RED' }}
+                            </p>
+                        </div>
+
+                        <div class="col-span-12 sm:col-span-5 flex items-center justify-center"
+                             v-html="slides[currentSlide].content">
+                        </div>
+
+                    </div>
+
+                    <div class="mt-auto pt-5">
+                        <p class="text-corporate-primary font-bold text-lg sm:text-2xl tracking-wide">
+                            {{ slides[currentSlide].date || computedDate }}
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    v-else-if="slides[currentSlide].isIndex"
+                    :key="'index-' + currentSlide"
+                    class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
+
+                    <h2 class="text-2xl sm:text-4xl font-bold text-corporate-primary mb-10 border-b border-gray-200 pb-4">
+                        {{ slides[currentSlide].title }}
+                    </h2>
+
+                    <div class="flex flex-col gap-6 max-w-3xl pl-2 sm:pl-4">
+
+                        <div
+                            v-for="(item,idx) in slides[currentSlide].items"
+                            :key="idx"
+                            class="flex items-center gap-5 sm:gap-6 group">
+
+                            <button
+                                @click="navigateFromIndex(idx)"
+                                class="w-12 h-12 shrink-0 border-2 border-corporate-primary text-corporate-primary font-bold text-xl sm:text-2xl flex items-center justify-center bg-white shadow-sm hover:bg-corporate-primary hover:text-white transition-colors rounded-[10px] focus:outline-none active:scale-95 cursor-pointer">
+                                {{ idx + 1 }}
+                            </button>
+
+                            <span class="font-bold text-corporate-dark text-lg sm:text-xl">
+                                {{ item }}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div
+                    v-else
+                    :key="'content-' + currentSlide"
+                    class="w-full max-w-5xl mx-auto mt-0 mb-auto text-left pb-4 relative z-10">
+
+                    <div class="flex items-center gap-4 mb-6">
+
+                        <button
+                            @click="returnToIndex"
+                            :class="{'cursor-pointer hover:bg-corporate-secondary/20 transition-colors active:scale-95':hasIndex,'cursor-default':!hasIndex}"
+                            class="shrink-0 inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 border-2 border-corporate-primary text-corporate-primary font-bold text-xl sm:text-2xl shadow-sm bg-white rounded-[10px] focus:outline-none">
+
+                            <template v-if="slides[currentSlide].stepNumber">
+                                {{ slides[currentSlide].stepNumber }}
+                            </template>
+
+                            <i v-else-if="slides[currentSlide].icon" class="material-icons text-xl sm:text-2xl">
+                                {{ slides[currentSlide].icon }}
+                            </i>
+                        </button>
+
+                        <h2 class="text-lg sm:text-2xl font-bold text-corporate-primary m-0 leading-tight pr-24">
+                            {{ slides[currentSlide].title }}
+                        </h2>
+
+                    </div>
+
+                    <div class="w-full text-xs sm:text-sm" v-html="slides[currentSlide].content"></div>
+                </div>
+
+            </transition>
+        </div>
+
+        <div class="shrink-0 bg-gray-50 border-t border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 z-10 text-sm">
+
+            <div class="flex flex-col items-center sm:items-start w-full sm:w-auto">
+                <button
+                    @click="prevSlide"
+                    :disabled="isFirstSlide"
+                    class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300"
+                    :class="isFirstSlide ? 'text-gray-400 cursor-not-allowed opacity-50' : 'text-corporate-primary hover:bg-corporate-primary/10 active:scale-95'">
+                    <i class="material-icons text-xs">arrow_back_ios</i>
+                    Anterior
+                </button>
+                <span class="text-[10px] text-transparent mt-1.5 select-none hidden sm:block">spacer</span>
+            </div>
+
+            <div class="flex gap-3 order-first sm:order-none mb-2 sm:mb-0">
+                <button
+                    v-for="(slide,index) in slides"
+                    :key="index"
+                    @click="goToSlide(index)"
+                    class="w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none"
+                    :class="index === currentSlide ? 'bg-corporate-primary scale-125' : 'bg-gray-300 hover:bg-corporate-secondary'">
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center sm:items-end w-full sm:w-auto">
+
+                <button
+                    v-if="!isLastSlide"
+                    @click="nextSlide"
+                    class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-semibold bg-corporate-primary text-white hover:bg-blue-800 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95">
+                    Avanzar
+                    <i class="material-icons text-xs">arrow_forward_ios</i>
+                </button>
+
+                <button
+                    v-else
+                    @click="finishPresentation"
+                    class="no-select w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2 rounded-lg font-semibold bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300 active:scale-95">
+                    Finalizar
+                    <i class="material-icons text-xs">check_circle</i>
+                </button>
+
+                <span class="text-[10px] text-gray-500 font-medium mt-1.5 tracking-wider select-none">
+                    {{ currentSlide + 1 }} de {{ slides.length }}
+                </span>
+
+            </div>
+        </div>
+
+    </div>
+
+    <p class="absolute bottom-2 sm:bottom-4 left-0 right-0 text-center text-corporate-secondary opacity-90 text-[10px] sm:text-xs font-medium tracking-wide">
+        Compensación T&C Colombia
+    </p>
+
+</div>
+
+<script>
+
+/*
+ * NAVEGACIÓN EXTERNA
+ * Las rutas se construyen fuera del contenido HTML de las láminas.
+ * Se abre una pestaña nueva mediante un enlace temporal.
+ */
+
+(function () {
+
+    const destinos = {
+
+        mrv:
+            'https:' + '/' + '/' +
+            'script.google.com/a/macros/bbva.com/s/' +
+            'AKfycbzPoa4GAx76FdiGsCF5SY1X7dIrWYMndm4-fLwQkYo2xQGn0PPX3Eo3qQneRgvJONETMA/' +
+            'exec?action=retribucion',
+
+        coco:
+            'https:' + '/' + '/' +
+            'script.google.com/a/macros/bbva.com/s/' +
+            'AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/' +
+            'exec'
+    };
+
+    window.abrirEnlace = function (destino) {
+
+        const url = destinos[destino];
+
+        if (!url) {
+            console.warn('Destino no configurado:', destino);
+            return;
+        }
+
+        const enlace = document.createElement('a');
+
+        enlace.href = url;
+        enlace.target = '_blank';
+        enlace.rel = 'noopener noreferrer';
+
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+    };
+
+})();
+
+new Vue({
+
+    el: '#app',
+
+    data: {
+
+        currentSlide: 0,
+        showThankYou: false,
+
+        
+        mrvBase64: '',
+        mrvImageError: false,
+
+
+        slides: [
+
+            /* =====================================================
+               1. PORTADA
+               ===================================================== */
+
+            {
+                isCover: true,
+
+                title: 'Tu Retribución Variable, ahora más clara.',
+
+                department: 'Mi Retribución Variable by COCO – RED',
+
+                subtitle: 'Conoce, comprende y consulta el detalle de tus pagos.',
+
+                date: '',
+
+                content: `
+                    <div class="w-full flex items-center justify-center">
+
+                        <div class="w-full max-w-[340px] rounded-2xl bg-white p-3"
+                             style="box-shadow:0 0 25px rgba(255,255,255,.95),0 12px 35px rgba(160,170,185,.12);">
+
+                            <img
+                                src="https://thisfor90s.github.io/cdn_images_for90s/coco_mrv.png"
+                                alt="COCO junto a Mi Retribución Variable"
+                                class="w-full object-contain"
+                                style="display:block;max-height:360px;"
+                            >
+
+                        </div>
+
+                    </div>
+                `
+            },
+
+            /* =====================================================
+               2. ÍNDICE
+               ===================================================== */
+
+            {
+                isIndex: true,
+
+                title: 'Nuestro recorrido',
+
+                items: [
+                    '¿Qué hay detrás de tu pago?',
+                    'Una experiencia pensada para ti',
+                    'Conoce Mi Retribución Variable',
+                    'Información y orientación',
+                    'Descúbrelo y compártelo'
+                ]
+            },
+
+            /* =====================================================
+               3. NECESIDAD
+               ===================================================== */
+
+            {
+                stepNumber: '1',
+
+                title: '¿Qué hay detrás de tu pago?',
+
+                content: `
+
+                    <div class="w-full">
+
+                        <div class="mb-5">
+                            <h3 class="text-xl sm:text-2xl font-bold text-corporate-primary leading-tight">
+                                Tu nómina muestra cuánto recibes.
+                                <span class="text-[#4A8DDE]">
+                                    Ahora podrás conocer cómo se compone.
+                                </span>
+                            </h3>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-5 items-stretch">
+
+                            <div class="col-span-12 sm:col-span-5 rounded-2xl bg-gray-50 border border-gray-200 p-6">
+
+                                <div class="flex items-center gap-3 mb-5">
+
+                                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                                        <i class="material-icons text-3xl text-gray-500">
+                                            receipt_long
+                                        </i>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">
+                                            Desprendible de nómina
+                                        </p>
+                                        <h4 class="text-lg font-bold">
+                                            El valor recibido
+                                        </h4>
+                                    </div>
+
+                                </div>
+
+                                <div class="bg-white rounded-xl border border-gray-200 p-6 text-center">
+
+                                    <p class="text-xs text-gray-500 font-semibold mb-3">
+                                        Retribución Variable
+                                    </p>
+
+                                    <p class="text-3xl sm:text-4xl font-black text-corporate-primary">
+                                        $10.000.000
+                                    </p>
+
+                                    <p class="text-xs text-gray-400 mt-3">
+                                        Ejemplo ilustrativo
+                                    </p>
+
+                                </div>
+
+                                <p class="text-xs text-gray-500 mt-4 leading-relaxed">
+                                    El valor recibido puede incluir pagos correspondientes
+                                    a distintos períodos.
+                                </p>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-7 rounded-2xl bg-[#F0F7FF] border border-[#D9EAFF] p-6">
+
+                                <div class="flex items-center gap-3 mb-5">
+
+                                    <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                                        <i class="material-icons text-3xl text-corporate-primary">
+                                            layers
+                                        </i>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-xs uppercase tracking-widest text-[#4A8DDE] font-bold">
+                                            Mi Retribución Variable
+                                        </p>
+
+                                        <h4 class="text-lg font-bold text-corporate-primary">
+                                            Conoce qué integra tu pago
+                                        </h4>
+                                    </div>
+
+                                </div>
+
+                                <div class="space-y-3">
+
+                                    <div class="bg-white border border-blue-100 rounded-xl p-4 flex items-center gap-3">
+                                        <i class="material-icons text-corporate-primary">calendar_today</i>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-sm">Liquidación de agosto</p>
+                                            <p class="text-xs text-gray-500">Período de ejecución</p>
+                                        </div>
+                                        <i class="material-icons text-[#85C8FF]">check_circle</i>
+                                    </div>
+
+                                    <div class="bg-white border border-blue-100 rounded-xl p-4 flex items-center gap-3">
+                                        <i class="material-icons text-corporate-primary">history</i>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-sm">Reliquidación de julio</p>
+                                            <p class="text-xs text-gray-500">Ajuste de período anterior</p>
+                                        </div>
+                                        <i class="material-icons text-[#85C8FF]">check_circle</i>
+                                    </div>
+
+                                    <div class="bg-white border border-blue-100 rounded-xl p-4 flex items-center gap-3">
+                                        <i class="material-icons text-corporate-primary">history</i>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-sm">Reliquidación de junio</p>
+                                            <p class="text-xs text-gray-500">Ajuste de período anterior</p>
+                                        </div>
+                                        <i class="material-icons text-[#85C8FF]">check_circle</i>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 rounded-xl bg-[#EAF5FF] px-5 py-3 flex items-center gap-3">
+
+                            <i class="material-icons text-corporate-primary">info</i>
+
+                            <p class="text-xs sm:text-sm font-medium text-corporate-primary">
+                                Performance Management muestra el cumplimiento mediante el EDI.
+                                MRV complementa esa información con el detalle monetario del pago.
+                            </p>
+
+                        </div>
+
+                    </div>
+                `
+            },
+
+            /* =====================================================
+               4. PILARES DE VALOR
+               ===================================================== */
+
+            {
+                stepNumber: '2',
+
+                title: 'Una experiencia pensada para ti',
+
+                content: `
+
+                    <div class="w-full">
+
+                        <p class="text-sm text-gray-600 mb-5">
+                            Más claridad, autonomía y acompañamiento para nuestros colaboradores.
+                        </p>
+
+                        <div class="grid grid-cols-12 gap-4">
+
+                            <div class="col-span-12 sm:col-span-6 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-6">
+
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        touch_app
+                                    </i>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-corporate-primary mb-2">
+                                    Autogestión
+                                </h3>
+
+                                <p class="font-semibold mb-2">
+                                    Tu información, cuando la necesitas.
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Consulta inmediatamente el detalle de tus pagos,
+                                    sin abrir un caso SAE únicamente para conocer su composición.
+                                </p>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-6 bg-gray-50 border border-gray-100 rounded-2xl p-6">
+
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        visibility
+                                    </i>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-corporate-primary mb-2">
+                                    Transparencia
+                                </h3>
+
+                                <p class="font-semibold mb-2">
+                                    Claridad sobre lo que recibes.
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Conoce las liquidaciones, reliquidaciones y factores
+                                    que componen tu Retribución Variable.
+                                </p>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-6 bg-gray-50 border border-gray-100 rounded-2xl p-6">
+
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        support_agent
+                                    </i>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-corporate-primary mb-2">
+                                    Orientación
+                                </h3>
+
+                                <p class="font-semibold mb-2">
+                                    Sabes dónde acudir.
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Encuentra los canales correspondientes para gestionar
+                                    consultas, peticiones, quejas y reclamaciones.
+                                </p>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-6 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-6">
+
+                                <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        favorite
+                                    </i>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-corporate-primary mb-2">
+                                    Cercanía · RCP
+                                </h3>
+
+                                <p class="font-semibold mb-2">
+                                    El colaborador en el centro.
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Fortalecemos Radical Client Perspective mediante una
+                                    experiencia empática, sencilla y cercana.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `
+            },
+
+            /* =====================================================
+               5. MRV + COCO
+               ===================================================== */
+
+            {
+                stepNumber: '3',
+
+                title: 'Conoce Mi Retribución Variable',
+
+                content: `
+
+                    <div class="w-full">
+
+                        <p class="text-sm text-gray-600 mb-4">
+                            Toda la información de tu Retribución Variable, en un solo lugar.
+                        </p>
+
+                        <div class="grid grid-cols-12 gap-4 items-stretch">
+
+                            <div class="col-span-12 sm:col-span-8 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-4">
+
+                                <div class="flex items-center gap-2 mb-3">
+                                    <i class="material-icons text-corporate-primary">dashboard</i>
+                                    <h3 class="text-base font-bold text-corporate-primary">
+                                        Mi Retribución Variable
+                                    </h3>
+                                </div>
+
+                                <div class="bg-white border border-blue-100 rounded-xl p-2">
+
+                                    <div
+                                        class="drive-image-container mrv-image-slot w-full flex items-center justify-center"
+                                        data-image-input="https://drive.google.com/file/d/1Oy_kMzgjM1t92qQWXslRoaElzWlX8cRb/view?usp=drive_link"
+                                        style="min-height:170px;">
+
+                                        <div class="text-center py-8">
+                                            <i class="material-icons text-4xl text-[#85C8FF] animate-pulse">
+                                                image
+                                            </i>
+                                            <p class="text-xs text-gray-400 mt-2">
+                                                Cargando captura de MRV...
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-2 mt-3">
+
+                                    <div class="bg-white rounded-lg p-2 text-center">
+                                        <i class="material-icons text-corporate-primary text-xl">date_range</i>
+                                        <p class="text-[10px] font-semibold mt-1">
+                                            Consulta por período
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-2 text-center">
+                                        <i class="material-icons text-corporate-primary text-xl">receipt_long</i>
+                                        <p class="text-[10px] font-semibold mt-1">
+                                            Detalle de pagos
+                                        </p>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-2 text-center">
+                                        <i class="material-icons text-corporate-primary text-xl">support_agent</i>
+                                        <p class="text-[10px] font-semibold mt-1">
+                                            Canales de atención
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-4 bg-[#EAF5FF] border border-[#D9EAFF] rounded-2xl p-5 flex flex-col items-center justify-center text-center">
+
+                                <div class="w-full flex items-center justify-center mb-3">
+
+                                    <img
+                                        src="${'https:' + '/' + '/' + 'thisfor90s.github.io/cdn_images_for90s/coco_noback_dream.png'}"
+                                        alt="Consultor COCO"
+                                        class="w-full max-w-[175px] object-contain"
+                                        style="max-height:230px;"
+                                    >
+
+                                </div>
+
+                                <p class="text-[10px] uppercase tracking-widest font-bold text-[#4A8DDE] mb-2">
+                                    Tu aliado inteligente
+                                </p>
+
+                                <h3 class="text-lg font-bold text-corporate-primary mb-2">
+                                    ¿Tienes dudas? Pregúntale a COCO.
+                                </h3>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Tu asistente de IA especializado en la
+                                    Política de Retribución Variable.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                `
+            },
+
+            /* =====================================================
+               6. INFORMACIÓN Y ORIENTACIÓN
+               ===================================================== */
+
+            {
+                stepNumber: '4',
+
+                title: 'Información y orientación en un mismo lugar',
+
+                content: `
+
+                    <div class="w-full">
+
+                        <p class="text-sm text-gray-600 mb-5">
+                            MRV facilita la consulta de tus pagos y te orienta
+                            hacia los canales correspondientes cuando los necesitas.
+                        </p>
+
+                        <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-5 mb-4">
+
+                            <div class="flex items-center gap-4">
+
+                                <div class="w-14 h-14 bg-white rounded-xl flex items-center justify-center shrink-0">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        account_balance_wallet
+                                    </i>
+                                </div>
+
+                                <div class="flex-1">
+
+                                    <p class="text-[11px] uppercase tracking-widest text-[#4A8DDE] font-bold mb-1">
+                                        Tu punto de consulta
+                                    </p>
+
+                                    <h3 class="text-xl font-bold text-corporate-primary">
+                                        Mi Retribución Variable
+                                    </h3>
+
+                                    <p class="text-xs text-gray-600 mt-1">
+                                        Consulta y comprende el detalle monetario de tus pagos.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="flex items-center justify-center mb-4">
+                            <i class="material-icons text-3xl text-corporate-primary">
+                                south
+                            </i>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-5">
+
+                            <div class="col-span-12 sm:col-span-6 bg-white border border-gray-200 rounded-2xl p-6">
+
+                                <div class="w-14 h-14 bg-[#EAF5FF] rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        query_stats
+                                    </i>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-corporate-primary mb-2">
+                                    Performance Management
+                                </h3>
+
+                                <p class="text-sm font-semibold mb-3">
+                                    Información de cumplimiento
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Consulta tu información de cumplimiento comercial
+                                    y los indicadores EDI.
+                                </p>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-6 bg-white border border-gray-200 rounded-2xl p-6">
+
+                                <div class="w-14 h-14 bg-[#EAF5FF] rounded-xl flex items-center justify-center mb-4">
+                                    <i class="material-icons text-3xl text-corporate-primary">
+                                        headset_mic
+                                    </i>
+                                </div>
+
+                                <h3 class="text-lg font-bold text-corporate-primary mb-2">
+                                    Canal SAE
+                                </h3>
+
+                                <p class="text-sm font-semibold mb-3">
+                                    Consultas y reclamaciones
+                                </p>
+
+                                <p class="text-xs text-gray-600 leading-relaxed">
+                                    Gestiona tus consultas, peticiones y reclamaciones
+                                    cuando corresponda.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-5 bg-[#EAF5FF] rounded-xl px-5 py-3 flex items-center gap-3">
+
+                            <i class="material-icons text-corporate-primary">
+                                lightbulb
+                            </i>
+
+                            <p class="text-xs sm:text-sm font-semibold text-corporate-primary">
+                                Más información para comprender tu pago.
+                                Los canales institucionales siguen disponibles para acompañarte.
+                            </p>
+
+                        </div>
+
+                    </div>
+                `
+            },
+
+            /* =====================================================
+               7. CIERRE Y LLAMADO A LA ACCIÓN
+               ===================================================== */
+
+            {
+                stepNumber: '5',
+
+                title: 'Descúbrelo y compártelo con tu equipo',
+
+                content: `
+
+                    <div class="w-full">
+
+                        <p class="text-sm text-gray-600 mb-4">
+                            Conoce las herramientas que ponemos a tu disposición
+                            y promueve su uso entre tus equipos.
+                        </p>
+
+                        <div class="grid grid-cols-12 gap-5 items-stretch">
+
+                            <div class="col-span-12 sm:col-span-7 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-5 flex flex-col">
+
+                                <div class="flex items-center gap-2 mb-3">
+
+                                    <i class="material-icons text-corporate-primary">
+                                        dashboard
+                                    </i>
+
+                                    <h3 class="text-lg font-bold text-corporate-primary">
+                                        Mi Retribución Variable
+                                    </h3>
+
+                                </div>
+
+                                <div class="bg-white border border-blue-100 rounded-xl p-3 flex-1 flex items-center justify-center">
+
+                                    <div
+                                        class="drive-image-container mrv-image-slot w-full flex items-center justify-center"
+                                        data-image-input="https://drive.google.com/file/d/1Oy_kMzgjM1t92qQWXslRoaElzWlX8cRb/view?usp=drive_link"
+                                        style="min-height:175px;">
+
+                                        <div class="text-center py-8">
+                                            <i class="material-icons text-4xl text-[#85C8FF] animate-pulse">
+                                                image
+                                            </i>
+                                            <p class="text-xs text-gray-400 mt-2">
+                                                Cargando captura de MRV...
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="window.abrirEnlace('mrv')"
+                                    class="mt-4 w-full rounded-xl bg-corporate-primary text-white px-4 py-3 font-bold text-sm hover:bg-blue-800 transition-colors cursor-pointer flex items-center justify-center gap-2">
+
+                                    Ir a Mi Retribución Variable
+
+                                    <i class="material-icons text-sm">
+                                        open_in_new
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                            <div class="col-span-12 sm:col-span-5 bg-[#EAF5FF] border border-[#D9EAFF] rounded-2xl p-5 flex flex-col">
+
+                                <div class="flex items-center gap-2 mb-3">
+
+                                    <i class="material-icons text-corporate-primary">
+                                        smart_toy
+                                    </i>
+
+                                    <h3 class="text-lg font-bold text-corporate-primary">
+                                        Consultor COCO
+                                    </h3>
+
+                                </div>
+
+                                <div class="bg-white border border-blue-100 rounded-xl p-3 flex-1 flex items-center justify-center">
+
+                                    <img
+                                        src="https://thisfor90s.github.io/cdn_images_for90s/coco_noback_dream.png"
+                                        alt="Consultor COCO"
+                                        class="w-full max-w-[160px] object-contain"
+                                        style="max-height:225px;"
+                                    >
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onclick="window.abrirEnlace('coco')"
+                                    class="mt-4 w-full rounded-xl bg-corporate-primary text-white px-4 py-3 font-bold text-sm hover:bg-blue-800 transition-colors cursor-pointer flex items-center justify-center gap-2">
+
+                                    Ir a Consultor COCO
+
+                                    <i class="material-icons text-sm">
+                                        open_in_new
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4 bg-[#EAF5FF] border border-[#D9EAFF] rounded-xl px-5 py-3 flex items-center justify-center gap-3">
+
+                            <i class="material-icons text-corporate-primary">
+                                campaign
+                            </i>
+
+                            <p class="text-sm font-bold text-corporate-primary text-center">
+                                Conócelas, utilízalas y promueve su uso entre tus equipos.
+                            </p>
+
+                        </div>
+
+                    </div>
+                `
+            }
+
+        ]
+    },
+
+    computed: {
+
+        isFirstSlide() {
+            return this.currentSlide === 0;
+        },
+
+        isLastSlide() {
+            return this.currentSlide === this.slides.length - 1;
+        },
+
+        computedDate() {
+
+            const months = [
+                'Enero','Febrero','Marzo','Abril',
+                'Mayo','Junio','Julio','Agosto',
+                'Septiembre','Octubre','Noviembre','Diciembre'
+            ];
+
+            const d = new Date();
+
+            return months[d.getMonth()] + ' ' + d.getFullYear();
+        },
+
+        hasIndex() {
+            return this.slides.findIndex(s => s.isIndex) !== -1;
+        },
+
+        indexSlidePosition() {
+            return this.slides.findIndex(s => s.isIndex);
+        }
+    },
+
+    methods: {
+
+        nextSlide() {
+            if (!this.isLastSlide) this.currentSlide++;
+        },
+
+        prevSlide() {
+            if (!this.isFirstSlide) this.currentSlide--;
+        },
+
+        goToSlide(index) {
+            this.currentSlide = index;
+        },
+
+        finishPresentation() {
+            this.showThankYou = true;
+        },
+
+        closeThankYou() {
+            this.showThankYou = false;
+            this.currentSlide = 0;
+        },
+
+        navigateFromIndex(idx) {
+
+            const targetSlide = this.indexSlidePosition + 1 + idx;
+
+            if (this.slides[targetSlide]) {
+                this.currentSlide = targetSlide;
+            }
+        },
+
+        returnToIndex() {
+
+            if (this.hasIndex) {
+                this.currentSlide = this.indexSlidePosition;
+            }
+        },
+
+        
+        renderMRVImage() {
+
+            const containers = document.querySelectorAll(
+                '.mrv-image-slot'
+            );
+
+            containers.forEach(container => {
+
+                if (this.mrvBase64) {
+
+                    let img = container.querySelector(
+                        'img[data-mrv-rendered]'
+                    );
+
+                    if (!img) {
+
+                        img = document.createElement('img');
+
+                        img.setAttribute(
+                            'data-mrv-rendered',
+                            'true'
+                        );
+
+                        img.alt =
+                            'Captura de Mi Retribución Variable';
+
+                        img.className =
+                            'w-full object-contain rounded-lg';
+
+                        img.style.display = 'block';
+
+                        // Lámina 5: índice 4.
+                        // Lámina 7: índice 6.
+                        img.style.maxHeight =
+                            this.currentSlide === 4
+                                ? '245px'
+                                : '220px';
+
+                        container.replaceChildren(img);
+
+                    }
+
+                    if (img.src !== this.mrvBase64) {
+                        img.src = this.mrvBase64;
+                    }
+
+                } else if (this.mrvImageError) {
+
+                    container.innerHTML =
+                        '<div class="w-full text-center py-8">' +
+                        '<i class="material-icons text-3xl text-gray-300">' +
+                        'broken_image</i>' +
+                        '<p class="text-xs text-gray-400 mt-2">' +
+                        'Imagen no disponible</p>' +
+                        '</div>';
+
+                }
+
+            });
+
+        },
+
+    },
+
+    
+    
+    mounted() {
+
+        // Una única URL para ambas láminas.
+        const imageInput =
+            'https://drive.google.com/file/d/' +
+            '1Oy_kMzgjM1t92qQWXslRoaElzWlX8cRb/' +
+            'view?usp=drive_link';
+
+        // Pintar el contenedor inicial.
+        this.$nextTick(() => {
+            this.renderMRVImage();
+        });
+
+        if (
+            typeof google === 'undefined' ||
+            !google.script ||
+            !google.script.run
+        ) {
+            console.warn(
+                'La carga Base64 requiere Google Apps Script.'
+            );
+            return;
+        }
+
+        // UNA sola solicitud al backend.
+        google.script.run
+            .withSuccessHandler(res => {
+
+                if (res && res.success && res.base64) {
+
+                    // Guardar una sola vez en Vue.
+                    this.mrvBase64 = res.base64;
+                    this.mrvImageError = false;
+
+                    console.log(
+                        'MRV Base64 cargado correctamente.'
+                    );
+
+                } else {
+
+                    this.mrvImageError = true;
+                    console.error(
+                        'Respuesta Base64 no válida:',
+                        res
+                    );
+
+                }
+
+                this.$nextTick(() => {
+                    this.renderMRVImage();
+                });
+
+            })
+            .withFailureHandler(error => {
+
+                this.mrvImageError = true;
+
+                console.error(
+                    'Error al obtener imagen MRV:',
+                    error
+                );
+
+                this.$nextTick(() => {
+                    this.renderMRVImage();
+                });
+
+            })
+            .processImageToBase64(imageInput);
+    },
+
+    
+});
+</script>
+
+</body>
+</html>

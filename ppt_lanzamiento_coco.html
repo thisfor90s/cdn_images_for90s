@@ -34,21 +34,11 @@
             justify-content: center;
             isolation: isolate;
         }
+        
         .coco-sensor-stage::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: -2;
-            border-radius: 50%;
-            background: radial-gradient(
-                ellipse at center,
-                rgba(245,248,252,.95) 0%,
-                rgba(228,233,240,.62) 30%,
-                rgba(240,243,247,.27) 58%,
-                rgba(255,255,255,0) 77%
-            );
-            filter: blur(18px);
+            content: none;
         }
+
         .coco-sensor-ring {
             position: absolute;
             z-index: -1;
@@ -63,6 +53,28 @@
             animation: coco-sensor-pulse 6s ease-out infinite;
             pointer-events: none;
         }
+
+        
+        .coco-sensor-ring {
+            display: none !important;
+        }
+
+        
+        /* Iluminación blanca perimetral COCO + MRV */
+        .coco-sensor-image {
+            background: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+
+            box-shadow:
+                0 0 18px 7px rgba(255, 255, 255, 0.85),
+                0 0 38px 12px rgba(255, 255, 255, 0.55),
+                0 12px 32px rgba(155, 165, 180, 0.12);
+
+            overflow: hidden;
+        }
+
+
         .coco-sensor-ring:nth-child(2) { animation-delay: 2s; }
         .coco-sensor-ring:nth-child(3) { animation-delay: 4s; }
         @keyframes coco-sensor-pulse {
@@ -176,6 +188,20 @@
     </div>
 
     <script>
+
+        
+        function abrirConsultorCOCO(event) {
+            event.preventDefault();
+
+            const url = 'https:' + '/' + '/' +
+                'script.google.com/a/macros/bbva.com/s/' +
+                'AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec';
+
+            window.open(url, '_blank', 'noopener,noreferrer');
+
+            return false;
+        }
+
         new Vue({
             el: '#app',
             data: {
@@ -194,7 +220,7 @@
                                 <span class="coco-sensor-ring"></span>
                                 <div class="coco-sensor-image">
                                     <img
-                                        src="https://thisfor90s.github.io/cdn_images_for90s/coco_noback_dream.png"
+                                        src="https://thisfor90s.github.io/cdn_images_for90s/coco_mrv.png"
                                         alt="Mascota Consultor COCO"
                                         class="w-full h-full object-contain"
                                         style="display:block;"
@@ -245,7 +271,8 @@
                                                 Acceder al módulo
                                                 <i class="material-icons text-sm">open_in_new</i>
                                             </a>
-                                            <a href="https://script.google.com/a/macros/bbva.com/s/AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec"
+                                            <a href="${'https:' + '/' + '/' + 'script.google.com/a/macros/bbva.com/s/AKfycbx_i7ptgM2-lPNdirKn7W43iZ10VG-n4zZ9IyZXGv_hyT9W_hhoonjqD3VehhecLISf/exec'}"
+
                                                target="_blank" rel="noopener noreferrer"
                                                title="Abrir Consultor COCO"
                                                class="flex flex-col items-center gap-1 text-corporate-primary hover:scale-105 transition-transform cursor-pointer">
@@ -471,19 +498,21 @@
                                 <div class="col-span-12 sm:col-span-5 bg-[#F0F7FF] border border-[#D9EAFF] rounded-2xl p-4">
                                     <h3 class="font-bold text-corporate-primary text-sm mb-2">Comunicación corporativa a la RED</h3>
                                     <a href="https://script.google.com/a/bbva.com/macros/s/AKfycbwSEH5-qxsEPzf-uPZX89gfSfuAwwlKud8XbpKGcfE4pi51KTfCZbuEBcDgAheWx-S6/exec?slide=ppt_1792769398718" target="_blank" rel="noopener noreferrer" class="block bg-white rounded-xl border border-blue-100 p-2 text-center cursor-pointer" title="Abrir pieza web en una nueva pestaña">
-                                        <img
-                                            src="https://thisfor90s.github.io/cdn_images_for90s/Mi_Retribucion_Variable_COCO.png"
-                                            alt="Pieza de comunicación Mi Retribución Variable by COCO – RED"
-                                            class="w-full h-[330px] object-contain"
-                                            style="display:block;"
-                                        />
+                                        <img src="${'https:' + '/' + '/' + 'thisfor90s.github.io/cdn_images_for90s/Mi_Retribucion_Variable_COCO.png'}" alt="Pieza de comunicación Mi Retribución Variable by COCO - RED" class="w-full h-[330px] object-contain" style="display:block;">
                                     </a>
                                     <p class="text-[11px] text-corporate-primary mt-2 font-semibold text-center">Haz clic para abrir la versión web ↗</p>
                                 </div>
                                 <div class="col-span-12 sm:col-span-7 flex flex-col gap-3">
                                     <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4">
                                         <h3 class="font-bold text-corporate-primary text-sm mb-3">Banner de firmas · Front y Compensación</h3>
-                                        <img src="https://thisfor90s.github.io/cdn_images_for90s/banner_coco_1.png" alt="Banner corporativo Consultor COCO" class="w-full h-auto object-contain rounded-lg" />
+                                        <a href="#"
+                                            onclick="return abrirConsultorCOCO(event)"
+                                            class="block cursor-pointer"
+                                            title="Abrir Consultor COCO">
+                                                <img src="${'https:' + '/' + '/' + 'thisfor90s.github.io/cdn_images_for90s/banner_coco_1.png'}"
+                                                    alt="Banner corporativo Consultor COCO"
+                                                    class="w-full h-auto object-contain rounded-lg" />
+                                        </a>
                                     </div>
                                     <div class="grid grid-cols-2 gap-3 flex-1">
                                         <div class="bg-[#F0F7FF] border border-[#D9EAFF] rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
@@ -528,15 +557,24 @@
                     if (this.hasIndex) { this.currentSlide = this.indexSlidePosition; }
                 }
             },
+            
             updated() {
-                // Conserva las fechas durante la navegación sin almacenamiento persistente.
                 this.$nextTick(() => {
+
+                    // 1. Recuperar las fechas durante la navegación
                     document.querySelectorAll('[data-activity-date]').forEach(el => {
-                        const value = (window.__cocoDates || {})[el.getAttribute('data-activity-date')];
-                        if (value && el.value !== value) el.value = value;
+                        const value = (window.__cocoDates || {})[
+                            el.getAttribute('data-activity-date')
+                        ];
+
+                        if (value && el.value !== value) {
+                            el.value = value;
+                        }
                     });
+
                 });
             },
+
             mounted() {
                 // Pre-carga silenciosa de imágenes al inicializar la app
                 this.slides.forEach((slide, index) => {
